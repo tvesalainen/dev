@@ -25,7 +25,7 @@ import org.vesalainen.dev.FileIO;
  *
  * @author tkv
  */
-public class Test
+public class Test1
 {
     public static void test1()
     {
@@ -35,7 +35,7 @@ public class Test
         }
         catch (IOException ex)
         {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
         }
         try (FileIO fio = FileIO.open("test1.bin"))
         {
@@ -47,7 +47,7 @@ public class Test
         }
         catch (IOException ex)
         {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     public static void test2()
@@ -58,7 +58,7 @@ public class Test
         }
         catch (IOException ex)
         {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
         }
         try (FileIO fio = FileIO.open("test2.bin"))
         {
@@ -76,7 +76,7 @@ public class Test
         }
         catch (IOException ex)
         {
-            Logger.getLogger(Test.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     public static void main(String... args)

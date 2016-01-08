@@ -5,5 +5,5 @@ CLASSPATH=../target/classes
 
 cat /dev/null test1.bin
 cat /dev/null test2.bin
-sudo $JAVA -cp $CLASSPATH org.vesalainen.dev.test.Test
+$JAVA -cp $CLASSPATH org.vesalainen.dev.test.Test1
 

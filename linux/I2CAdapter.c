@@ -15,18 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static int debug;
+#undef __cplusplus
 
+#include <limits.h>
+#include <string.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <linux/i2c-dev.h>
 
-#define ERRORRETURNV if (debug) fprintf(stderr, "Error at %d\n", __LINE__);return;
-#define ERRORRETURN if (debug) fprintf(stderr, "Error at %d\n", __LINE__);return 0;
-#define DEBUG(s) if (debug) fprintf(stderr, "%s at %d\n", (s), __LINE__);fflush(stderr);
+#include "org_vesalainen_dev_i2c_I2CAdapter.h"
+#include "Exception.h"
 
-#define CHECK(p)	if (!(p)) {ERRORRETURN;}
-#define CHECKV(p)	if (!(p)) {ERRORRETURNV;}
-#define CHECKEXC if ((*env)->ExceptionCheck(env)) {ERRORRETURN;};
-#define CHECKEXCV if ((*env)->ExceptionCheck(env)) {ERRORRETURNV;};
-
-#define EXCEPTION(m) exception(env, "java/io/IOException", m);ERRORRETURN;
-#define EXCEPTIONV(m) exception(env, "java/io/IOException", m);ERRORRETURNV;
-
+JNIEXPORT jint JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_openAdapter
+  (JNIEnv *env, jclass cls, jint adapter)
+{
+    int fd;
+    char filename[PATH_MAX];
+    
+    snprintf(filename, sizeof(filename), "/dev/i2c-%d", adapter);
+    fd = open(filename, O_RDWR);
+    if (fd < 0)
+    {
+        EXCEPTION(filename);
+    }
+    return fd;
+}
