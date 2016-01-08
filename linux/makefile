@@ -9,7 +9,7 @@ CLASSPATH=$(PROJECTDIR)/target/classes
 CLASSFILES=$(CLASSPATH)/org/vesalainen/dev/FileIO.class
 CLASSES=org.vesalainen.dev.FileIO
 
-$(HEADER):	$(CLASSFILES)
+headers:	$(CLASSFILES)
 	$(JAVAH) -v -d $(SOURCEDIR) -cp $(CLASSPATH) $(CLASSES)
 
 FileIO.o:	FileIO.c org_vesalainen_dev_FileIO.h
@@ -20,7 +20,7 @@ Dev.so:	FileIO.o Exception.o
 install:	Dev.so
 	cp Dev.so $(RESOURCES)/libDev$(MACHINE).so
 
-all:	install
+all:	headers install
 
 clean:
 	rm *.o
