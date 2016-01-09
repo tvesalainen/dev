@@ -15,15 +15,29 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdarg.h>
 
 #include <jni.h>
 
 
-void exception(JNIEnv * env, const char* clazz, const char* message)
+void exception(JNIEnv * env, const char* clazz, const char* fmt, ...)
 {
     jclass exc;
     char buf[256];
-
+    char message[200];
+    va_list ap;
+    int n;
+    
+    va_start(ap, fmt);
+    n = vsnprintf(message, sizeof(message), fmt, ap);
+    if (n > sizeof(message) || n < 0)
+    {
+        fprintf(stderr,"%s truncated\n", fmt);
+    }
+    va_end(ap);
+    
     exc = (*env)->FindClass(env, clazz);
     if (exc == NULL)
     {

@@ -27,6 +27,6 @@ static int debug;
 #define CHECKEXC if ((*env)->ExceptionCheck(env)) {ERRORRETURN;};
 #define CHECKEXCV if ((*env)->ExceptionCheck(env)) {ERRORRETURNV;};
 
-#define EXCEPTION(m) exception(env, "java/io/IOException", m);ERRORRETURN;
-#define EXCEPTIONV(m) exception(env, "java/io/IOException", m);ERRORRETURNV;
+#define EXCEPTION(...) exception(env, "java/io/IOException", __VA_ARGS__);ERRORRETURN;
+#define EXCEPTIONV(...) exception(env, "java/io/IOException", __VA_ARGS__);ERRORRETURNV;
 

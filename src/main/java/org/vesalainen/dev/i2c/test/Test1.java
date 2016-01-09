@@ -31,7 +31,8 @@ public class Test1
     {
         try (I2CAdapter i2c = I2CAdapter.open(1))
         {
-            
+            i2c.setAddress(0x68);
+            System.err.println(i2c.getFunctionality());
         }
         catch (IOException ex)
         {

@@ -17,7 +17,9 @@
 package org.vesalainen.dev.i2c;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import org.vesalainen.dev.FileIO;
+import org.vesalainen.util.EnumSetFlagger;
 
 /**
  *
@@ -25,19 +27,46 @@ import org.vesalainen.dev.FileIO;
  */
 public class I2CAdapter extends FileIO
 {
-
+    protected EnumSet<I2CFunctionality> funcs;
+    
     protected I2CAdapter(int fd)
     {
         super(fd);
     }
-
+    /**
+     * Creates I2CAdapter for /dev/i2c-<adapter>
+     * <p>examine /sys/class/i2c-dev/ or use i2cdetect -l to find adapter number
+     * @param adapter
+     * @return
+     * @throws IOException 
+     * @see <a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/i2c/dev-interface">I2C dev</a>
+     */
     public static I2CAdapter open(int adapter) throws IOException
     {
         int fd = I2CAdapter.openAdapter(adapter);
         I2CAdapter i2c = new I2CAdapter(fd);
+        long functionality = i2c.functionality(fd);
+        i2c.funcs = EnumSetFlagger.getSet(I2CFunctionality.class, functionality);
         return i2c;
     }
     
     private static native int openAdapter(int adapter) throws IOException;
+    private native long functionality(int fd) throws IOException;
+    /**
+     * Set device address for following methods
+     * @param address
+     * @throws IOException 
+     */
+    public void setAddress(int address) throws IOException
+    {
+        setAddress(fd, address);
+    }
+    private native void setAddress(int fd, int address) throws IOException;
+
+    public EnumSet<I2CFunctionality> getFunctionality()
+    {
+        return funcs;
+    }
+    
     
 }

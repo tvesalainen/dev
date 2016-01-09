@@ -15,6 +15,22 @@ extern "C" {
 JNIEXPORT jint JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_openAdapter
   (JNIEnv *, jclass, jint);
 
+/*
+ * Class:     org_vesalainen_dev_i2c_I2CAdapter
+ * Method:    functionality
+ * Signature: (I)J
+ */
+JNIEXPORT jlong JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_functionality
+  (JNIEnv *, jobject, jint);
+
+/*
+ * Class:     org_vesalainen_dev_i2c_I2CAdapter
+ * Method:    setAddress
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_setAddress
+  (JNIEnv *, jobject, jint, jint);
+
 #ifdef __cplusplus
 }
 #endif
