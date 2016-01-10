@@ -27,6 +27,7 @@ import org.vesalainen.util.EnumSetFlagger;
  */
 public class I2CAdapter extends FileIO
 {
+    protected short slave = -1;
     protected EnumSet<I2CFunctionality> funcs;
     
     protected I2CAdapter(int fd)
@@ -53,20 +54,52 @@ public class I2CAdapter extends FileIO
     private static native int openAdapter(int adapter) throws IOException;
     private native long functionality(int fd) throws IOException;
     /**
-     * Set device address for following methods
+     * Set device slave for following methods
      * @param address
      * @throws IOException 
      */
-    public void setAddress(int address) throws IOException
+    public void setAddress(short address) throws IOException
     {
-        setAddress(fd, address);
+        if (this.slave != address)
+        {
+            this.slave = address;
+            setAddress(fd, address);
+        }
     }
-    private native void setAddress(int fd, int address) throws IOException;
+    private native void setAddress(int fd, short address) throws IOException;
 
     public EnumSet<I2CFunctionality> getFunctionality()
     {
         return funcs;
     }
+    /**
+     * Set packet error checking
+     * @param pec
+     * @throws IOException 
+     */
+    public void setPEC(boolean pec) throws IOException
+    {
+        check(I2CFunctionality.SMBusPEC);
+        setPEC(fd, pec);
+    }
+    private native void setPEC(int fd, boolean pec) throws IOException;
+    /**
+     * Set 10 bit addressing
+     * @param tenBit
+     * @throws IOException 
+     */
+    public void set10Bit(boolean tenBit) throws IOException
+    {
+        check(I2CFunctionality.TenBitAddr);
+        set10Bit(fd, tenBit);
+    }
+    private native void set10Bit(int fd, boolean tenBit) throws IOException;
     
-    
+    protected void check(I2CFunctionality f)
+    {
+        if (!funcs.contains(f))
+        {
+            throw new UnsupportedOperationException(f+" not supported with current device");
+        }
+    }
 }

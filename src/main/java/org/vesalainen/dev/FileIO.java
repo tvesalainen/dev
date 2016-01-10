@@ -100,9 +100,13 @@ public class FileIO implements AutoCloseable
      */
     public int read(byte[] buf) throws IOException
     {
-        return read(fd, buf);
+        return read(fd, buf, 0, buf.length);
     }
-    private native int read(int fd, byte[] buff) throws IOException;
+    public int read(byte[] buf, int start, int length) throws IOException
+    {
+        return read(fd, buf, start, length);
+    }
+    private native int read(int fd, byte[] buf, int start, int length) throws IOException;
     /**
      * Writes bytes
      * @param bytes

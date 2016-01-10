@@ -72,10 +72,27 @@ JNIEXPORT jlong JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_functionality
     return res;
 }
 JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_setAddress
-  (JNIEnv *env, jobject obj, jint fd, jint address)
+  (JNIEnv *env, jobject obj, jint fd, jshort address)
 {
     if  (ioctl(fd, I2C_SLAVE, address) < 0)
     {
         EXCEPTIONV("setAddress(0x%x)", address);
+    }
+}
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_setPEC
+  (JNIEnv *env, jobject obj, jint fd, jboolean pec)
+{
+    if  (ioctl(fd, I2C_PEC, pec) < 0)
+    {
+        EXCEPTIONV("setPEC(0x%x)", pec);
+    }
+}
+
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_set10Bit
+  (JNIEnv *env, jobject obj, jint fd, jboolean ten)
+{
+    if  (ioctl(fd, I2C_TENBIT, ten) < 0)
+    {
+        EXCEPTIONV("set10Bit(0x%x)", ten);
     }
 }

@@ -85,11 +85,10 @@ JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_write__II
     }
 }
 
-JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_read__I_3B
-  (JNIEnv *env, jobject obj, jint fd, jbyteArray buf)
+JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_read__I_3BII
+  (JNIEnv *env, jobject obj, jint fd, jbyteArray buf, jint off, jint len)
 {
     jbyte *sBuf;
-    jsize size;
     int rc;
 
     sBuf = (*env)->GetByteArrayElements(env, buf, NULL);
@@ -97,9 +96,8 @@ JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_read__I_3B
     {
         EXCEPTION("GetByteArrayElements");
     }
-    size = (*env)->GetArrayLength(env, buf);
 
-    rc = read(fd, sBuf, size);
+    rc = read(fd, sBuf+off, len);
     if (rc < 0)
     {
         (*env)->ReleaseByteArrayElements(env, buf, sBuf, 0);
@@ -110,7 +108,7 @@ JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_read__I_3B
 }
 
 JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_write__I_3BII
-  (JNIEnv *env, jobject obj, jint fd, jbyteArray buf, jint start, jint length)
+  (JNIEnv *env, jobject obj, jint fd, jbyteArray buf, jint off, jint len)
 {
     jbyte *sBuf;
 
@@ -120,7 +118,7 @@ JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_write__I_3BII
         EXCEPTIONV("GetByteArrayElements");
     }
 
-    if (write(fd, sBuf+start, length) != length)
+    if (write(fd, sBuf+off, len) != len)
     {
         (*env)->ReleaseByteArrayElements(env, buf, sBuf, 0);
         EXCEPTIONV("write()");

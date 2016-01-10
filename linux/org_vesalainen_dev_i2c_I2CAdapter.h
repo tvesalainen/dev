@@ -26,10 +26,26 @@ JNIEXPORT jlong JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_functionality
 /*
  * Class:     org_vesalainen_dev_i2c_I2CAdapter
  * Method:    setAddress
- * Signature: (II)V
+ * Signature: (IS)V
  */
 JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_setAddress
-  (JNIEnv *, jobject, jint, jint);
+  (JNIEnv *, jobject, jint, jshort);
+
+/*
+ * Class:     org_vesalainen_dev_i2c_I2CAdapter
+ * Method:    setPEC
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_setPEC
+  (JNIEnv *, jobject, jint, jboolean);
+
+/*
+ * Class:     org_vesalainen_dev_i2c_I2CAdapter
+ * Method:    set10Bit
+ * Signature: (IZ)V
+ */
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_set10Bit
+  (JNIEnv *, jobject, jint, jboolean);
 
 #ifdef __cplusplus
 }
