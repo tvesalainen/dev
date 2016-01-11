@@ -51,8 +51,8 @@ public class I2CAdapter extends FileIO
         return i2c;
     }
     
-    private static native int openAdapter(int adapter) throws IOException;
-    private native long functionality(int fd) throws IOException;
+    static native int openAdapter(int adapter) throws IOException;
+    protected native long functionality(int fd) throws IOException;
     /**
      * Set device slave for following methods
      * @param address

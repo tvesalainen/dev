@@ -17,6 +17,7 @@
 package org.vesalainen.dev.i2c;
 
 import java.io.IOException;
+import org.vesalainen.util.EnumSetFlagger;
 
 /**
  *
@@ -25,9 +26,30 @@ import java.io.IOException;
 public class I2CSMBus extends I2CAdapter
 {
 
-    public I2CSMBus(int fd)
+    protected I2CSMBus(int fd)
     {
         super(fd);
+    }
+    /**
+     * Creates I2CSMBus for /dev/i2c-<adapter>
+     * <p>examine /sys/class/i2c-dev/ or use i2cdetect -l to find adapter number
+     * @param adapter
+     * @return
+     * @throws IOException 
+     * @see <a href="http://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git/tree/Documentation/i2c/dev-interface">I2C dev</a>
+     */
+    public static I2CSMBus open(int adapter) throws IOException
+    {
+        int fd = I2CAdapter.openAdapter(adapter);
+        I2CSMBus bus = new I2CSMBus(fd);
+        long functionality = bus.functionality(fd);
+        bus.funcs = EnumSetFlagger.getSet(I2CFunctionality.class, functionality);
+        return bus;
+    }
+    
+    public I2CSlave createSlave(short slaveAddress)
+    {
+        return new I2CSlave(fd, slaveAddress);
     }
     /**
      * This sends a single bit to the device
