@@ -31,7 +31,7 @@ public class Test1
     {
         try (FileIO fio = FileIO.open("test1.bin"))
         {
-            fio.write(66);
+            fio.write((byte)66);
         }
         catch (IOException ex)
         {

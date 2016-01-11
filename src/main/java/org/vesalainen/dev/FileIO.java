@@ -77,21 +77,21 @@ public class FileIO implements AutoCloseable
      * @return One byte
      * @throws IOException 
      */
-    public int read() throws IOException
+    public byte read() throws IOException
     {
         return read(fd);
     }
-    private native int read(int fd) throws IOException;
+    private native byte read(int fd) throws IOException;
     /**
      * Writes one byte
-     * @param cc Byte
+     * @param b Byte
      * @throws IOException 
      */
-    public void write(int cc) throws IOException
+    public void write(byte b) throws IOException
     {
-        write(fd, cc);
+        write(fd, b);
     }
-    private native void write(int fd, int cc) throws IOException;
+    private native void write(int fd, byte b) throws IOException;
     /**
      * Read bytes to buffer. Returns number of bytes actually read.
      * @param buf
@@ -102,11 +102,19 @@ public class FileIO implements AutoCloseable
     {
         return read(fd, buf, 0, buf.length);
     }
-    public int read(byte[] buf, int start, int length) throws IOException
+    /**
+     * Read bytes to buffer. Returns number of bytes actually read.
+     * @param buf
+     * @param off
+     * @param len
+     * @return
+     * @throws IOException 
+     */
+    public int read(byte[] buf, int off, int len) throws IOException
     {
-        return read(fd, buf, start, length);
+        return read(fd, buf, off, len);
     }
-    private native int read(int fd, byte[] buf, int start, int length) throws IOException;
+    private native int read(int fd, byte[] buf, int off, int len) throws IOException;
     /**
      * Writes bytes
      * @param bytes
@@ -119,13 +127,13 @@ public class FileIO implements AutoCloseable
     /**
      * Writes length bytes starting from start.
      * @param buf
-     * @param start
-     * @param length
+     * @param off
+     * @param len
      * @throws IOException 
      */
-    public void write(byte[] buf, int start, int length) throws IOException
+    public void write(byte[] buf, int off, int len) throws IOException
     {
-        write(fd, buf, start, length);
+        write(fd, buf, off, len);
     }
-    private native void write(int fd, byte[] buf, int start, int length) throws IOException;
+    private native void write(int fd, byte[] buf, int off, int len) throws IOException;
 }

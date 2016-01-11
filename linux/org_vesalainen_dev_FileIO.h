@@ -26,18 +26,18 @@ JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_close
 /*
  * Class:     org_vesalainen_dev_FileIO
  * Method:    read
- * Signature: (I)I
+ * Signature: (I)B
  */
-JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_read__I
+JNIEXPORT jbyte JNICALL Java_org_vesalainen_dev_FileIO_read__I
   (JNIEnv *, jobject, jint);
 
 /*
  * Class:     org_vesalainen_dev_FileIO
  * Method:    write
- * Signature: (II)V
+ * Signature: (IB)V
  */
-JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_write__II
-  (JNIEnv *, jobject, jint, jint);
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_write__IB
+  (JNIEnv *, jobject, jint, jbyte);
 
 /*
  * Class:     org_vesalainen_dev_FileIO

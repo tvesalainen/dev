@@ -60,7 +60,7 @@ JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_close
     }
 }
 
-JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_read__I
+JNIEXPORT jbyte JNICALL Java_org_vesalainen_dev_FileIO_read__I
   (JNIEnv *env, jobject obj, jint fd)
 {
     char buf[1];
@@ -73,8 +73,8 @@ JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_read__I
     return buf[0];
 }
 
-JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_write__II
-  (JNIEnv *env, jobject obj, jint fd, jint cc)
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_write__IB
+  (JNIEnv *env, jobject obj, jint fd, jbyte cc)
 {
     char buf[1];
 
