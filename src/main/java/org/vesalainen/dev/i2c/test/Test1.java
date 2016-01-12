@@ -20,6 +20,8 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.vesalainen.dev.i2c.I2CAdapter;
+import org.vesalainen.dev.i2c.I2CSMBus;
+import org.vesalainen.dev.i2c.mcp3424.MCP342X;
 
 /**
  *
@@ -41,8 +43,21 @@ public class Test1
             Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public static void test2()
+    {
+        try (I2CSMBus bus = I2CSMBus.open(1))
+        {
+            MCP342X mcp = new MCP342X(bus, (short)0x68);
+            mcp.measure(1, MCP342X.Resolution.Bits18, MCP342X.Gain.X1);
+        }
+        catch (IOException ex)
+        {
+            Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     public static void main(String... args)
     {
         test1();
+        test2();
     }
 }

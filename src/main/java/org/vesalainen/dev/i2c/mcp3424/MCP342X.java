@@ -16,6 +16,8 @@
  */
 package org.vesalainen.dev.i2c.mcp3424;
 
+import java.io.IOException;
+import java.util.Arrays;
 import org.vesalainen.dev.i2c.I2CSMBus;
 import org.vesalainen.dev.i2c.I2CSlave;
 
@@ -28,20 +30,58 @@ public class MCP342X
     public enum SampleRate {SPS240, SPS60, SPS15, SPS3_75};
     public enum Resolution {Bits12, Bits14, Bits16, Bits18};
     public enum Gain {X1, X2, X4, X8}
+
+    protected static final double Vref = 2.048;
+    protected static final double[] PGA = new double[] {1.0, 2.0, 4.0, 8.0};
+    protected static final double[] LSB = new double[4];
+    protected static final int[] MaxCode = new int[4];
+    protected static final int[] MinCode = new int[4];
     protected I2CSMBus bus;
     protected I2CSlave slave;
     protected byte config;
 
+    static
+    {
+        for (int ii=0;ii<4;ii++)
+        {
+            int bits = 12+2*ii;
+            LSB[ii] = 2.0*Vref/Math.pow(2, bits);
+            MaxCode[ii] = (int) (Math.pow(2, bits-1)-1);
+            MinCode[ii] = (int) -Math.pow(2, bits-1);
+        }
+    }
     public MCP342X()
     {
     }
 
-    public MCP342X(I2CSMBus bus, short slaveAddress)
+    public MCP342X(I2CSMBus bus, short slaveAddress) throws IOException
     {
         this.bus = bus;
         this.slave = bus.createSlave(slaveAddress);
     }
 
+    public double measure(int channel, Resolution resolution, Gain gain) throws IOException
+    {
+        setContinousConversion(false);
+        setReady(true);
+        setChannel(channel);
+        setResolution(resolution);
+        setGain(gain);
+        System.err.println(config);
+        slave.writeByte(config);
+        byte[] buf;
+        if (resolution == Resolution.Bits18)
+        {
+            buf = new byte[4];
+        }
+        else
+        {
+            buf = new byte[3];
+        }
+        int len = slave.readBlockData(config, buf);
+        System.err.println("len="+len+" "+Arrays.toString(buf));
+        return 0;
+    }
     public byte getConfig()
     {
         return config;
@@ -112,20 +152,9 @@ public class MCP342X
     {
         return Gain.values()[get2Bit(0)];
     }
-    public int getPGA()
+    public double getPGA()
     {
-        switch (getGain())
-        {
-            case X1:
-                return 1;
-            case X2:
-                return 2;
-            case X4:
-                return 4;
-            case X8:
-                return 8;
-        }
-        throw new IllegalArgumentException();
+        return PGA[get2Bit(0)]; 
     }
     
     protected void set(int bit, boolean value)

@@ -28,7 +28,7 @@ import org.vesalainen.dev.i2c.mcp3424.MCP342X.SampleRate;
  */
 public class MCP342XTest
 {
-    
+    static final double Epsilon = 1e-10;
     public MCP342XTest()
     {
     }
@@ -92,22 +92,22 @@ public class MCP342XTest
         
         m.setGain(MCP342X.Gain.X1);
         assertEquals(Gain.X1, m.getGain());
-        assertEquals(1, m.getPGA());
+        assertEquals(1, m.getPGA(), Epsilon);
         assertEquals((byte)0b01101100, m.getConfig());
         
         m.setGain(MCP342X.Gain.X2);
         assertEquals(Gain.X2, m.getGain());
-        assertEquals(2, m.getPGA());
+        assertEquals(2, m.getPGA(), Epsilon);
         assertEquals((byte)0b01101101, m.getConfig());
         
         m.setGain(MCP342X.Gain.X4);
         assertEquals(Gain.X4, m.getGain());
-        assertEquals(4, m.getPGA());
+        assertEquals(4, m.getPGA(), Epsilon);
         assertEquals((byte)0b01101110, m.getConfig());
         
         m.setGain(MCP342X.Gain.X8);
         assertEquals(Gain.X8, m.getGain());
-        assertEquals(8, m.getPGA());
+        assertEquals(8, m.getPGA(), Epsilon);
         assertEquals((byte)0b01101111, m.getConfig());
     }
     

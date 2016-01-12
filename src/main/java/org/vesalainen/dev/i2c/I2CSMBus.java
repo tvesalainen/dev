@@ -47,9 +47,12 @@ public class I2CSMBus extends I2CAdapter
         return bus;
     }
     
-    public I2CSlave createSlave(short slaveAddress)
+    public I2CSlave createSlave(short slaveAddress) throws IOException
     {
-        return new I2CSlave(fd, slaveAddress);
+        I2CSlave slave = new I2CSlave(fd, slaveAddress);
+        long functionality = slave.functionality(fd);
+        slave.funcs = EnumSetFlagger.getSet(I2CFunctionality.class, functionality);
+        return slave;
     }
     /**
      * This sends a single bit to the device
