@@ -39,6 +39,7 @@ JNIEXPORT jint JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_openAdapter
     {
         EXCEPTION("open(%s)", filename);
     }
+    DEBUG("open(%s) -> %d\n", filename, fd);
     return fd;
 }
 
@@ -47,28 +48,28 @@ JNIEXPORT jlong JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_functionality
 {
     jlong res = 0;
     unsigned long funcs;
-    int shift = 0;
     if  (ioctl(fd, I2C_FUNCS, &funcs) < 0)
     {
         EXCEPTION("functionality()");
     }
-    if (funcs & I2C_FUNC_I2C) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_10BIT_ADDR) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_PROTOCOL_MANGLING) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_PEC) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_BLOCK_PROC_CALL) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_QUICK) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_READ_BYTE) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_WRITE_BYTE) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_READ_BYTE_DATA) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_WRITE_BYTE_DATA) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_READ_WORD_DATA) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_WRITE_WORD_DATA) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_PROC_CALL) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_READ_BLOCK_DATA) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_WRITE_BLOCK_DATA) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_READ_I2C_BLOCK) res |= (1<<(shift++));
-    if (funcs & I2C_FUNC_SMBUS_WRITE_I2C_BLOCK) res |= (1<<(shift++));
+    DEBUG("funcs=%#x\n", funcs);
+    if (funcs & I2C_FUNC_I2C) res |= 1;
+    if (funcs & I2C_FUNC_10BIT_ADDR) res |= (1<<1);
+    if (funcs & I2C_FUNC_PROTOCOL_MANGLING) res |= (1<<2);
+    if (funcs & I2C_FUNC_SMBUS_PEC) res |= (1<<3);
+    if (funcs & I2C_FUNC_SMBUS_BLOCK_PROC_CALL) res |= (1<<4);
+    if (funcs & I2C_FUNC_SMBUS_QUICK) res |= (1<<5);
+    if (funcs & I2C_FUNC_SMBUS_READ_BYTE) res |= (1<<6);
+    if (funcs & I2C_FUNC_SMBUS_WRITE_BYTE) res |= (1<<7);
+    if (funcs & I2C_FUNC_SMBUS_READ_BYTE_DATA) res |= (1<<8);
+    if (funcs & I2C_FUNC_SMBUS_WRITE_BYTE_DATA) res |= (1<<9);
+    if (funcs & I2C_FUNC_SMBUS_READ_WORD_DATA) res |= (1<<10);
+    if (funcs & I2C_FUNC_SMBUS_WRITE_WORD_DATA) res |= (1<<11);
+    if (funcs & I2C_FUNC_SMBUS_PROC_CALL) res |= (1<<12);
+    if (funcs & I2C_FUNC_SMBUS_READ_BLOCK_DATA) res |= (1<<13);
+    if (funcs & I2C_FUNC_SMBUS_WRITE_BLOCK_DATA) res |= (1<<14);
+    if (funcs & I2C_FUNC_SMBUS_READ_I2C_BLOCK) res |= (1<<15);
+    if (funcs & I2C_FUNC_SMBUS_WRITE_I2C_BLOCK) res |= (1<<16);
     return res;
 }
 JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_setAddress
@@ -76,8 +77,9 @@ JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_setAddress
 {
     if  (ioctl(fd, I2C_SLAVE, address) < 0)
     {
-        EXCEPTIONV("setAddress(0x%x)", address);
+        EXCEPTIONV("setAddress(%d, %#x)", fd, address);
     }
+    DEBUG("setAddress(%d, %#x)\n", fd, address);
 }
 JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CAdapter_setPEC
   (JNIEnv *env, jobject obj, jint fd, jboolean pec)

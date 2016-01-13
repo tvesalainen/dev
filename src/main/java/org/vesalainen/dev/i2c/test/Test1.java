@@ -19,9 +19,12 @@ package org.vesalainen.dev.i2c.test;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.vesalainen.dev.FileIO;
 import org.vesalainen.dev.i2c.I2CAdapter;
 import org.vesalainen.dev.i2c.I2CSMBus;
 import org.vesalainen.dev.i2c.mcp3424.MCP342X;
+import org.vesalainen.dev.i2c.mcp3424.MCP342X.Gain;
+import org.vesalainen.dev.i2c.mcp3424.MCP342X.Resolution;
 
 /**
  *
@@ -35,7 +38,6 @@ public class Test1
         {
             i2c.setAddress((short)0x68);
             System.err.println(i2c.getFunctionality());
-            i2c.set10Bit(false);
             i2c.setPEC(false);
         }
         catch (IOException ex)
@@ -48,7 +50,16 @@ public class Test1
         try (I2CSMBus bus = I2CSMBus.open(1))
         {
             MCP342X mcp = new MCP342X(bus, (short)0x68);
-            mcp.measure(1, MCP342X.Resolution.Bits18, MCP342X.Gain.X1);
+            for (int r=0;r<4;r++)
+            {
+                Resolution res = Resolution.values()[r];
+                for (int g=0;g<4;g++)
+                {
+                    Gain gain = Gain.values()[g];
+                    double measure = mcp.measure(1, res, gain);
+                    System.err.println(res+" "+gain+" V="+measure);
+                }
+            }
         }
         catch (IOException ex)
         {
@@ -57,6 +68,7 @@ public class Test1
     }
     public static void main(String... args)
     {
+        FileIO.setDebug(true);
         test1();
         test2();
     }

@@ -111,4 +111,12 @@ public class MCP342XTest
         assertEquals((byte)0b01101111, m.getConfig());
     }
     
+    @Test
+    public void test2()
+    {
+        MCP342X m = new MCP342X();
+        m.setResolution(Resolution.Bits18);
+        double v = m.getVoltage((byte)0b01, (byte)0b11111111, (byte)0b11111111);
+        assertEquals(MCP342X.Vref, v, Epsilon);
+    }
 }

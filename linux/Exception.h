@@ -15,12 +15,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-static int debug;
+static int debug=1;
 
 
 #define ERRORRETURNV if (debug) fprintf(stderr, "Error at %d\n", __LINE__);return;
 #define ERRORRETURN if (debug) fprintf(stderr, "Error at %d\n", __LINE__);return 0;
-#define DEBUG(s) if (debug) fprintf(stderr, "%s at %d\n", (s), __LINE__);fflush(stderr);
+#define DEBUG(fmt, ...) if (debug) {fprintf(stderr, fmt, __VA_ARGS__);fflush(stderr);}
 
 #define CHECK(p)	if (!(p)) {ERRORRETURN;}
 #define CHECKV(p)	if (!(p)) {ERRORRETURNV;}

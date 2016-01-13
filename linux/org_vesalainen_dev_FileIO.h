@@ -17,6 +17,14 @@ JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_open
 
 /*
  * Class:     org_vesalainen_dev_FileIO
+ * Method:    debug
+ * Signature: (Z)V
+ */
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_debug
+  (JNIEnv *, jclass, jboolean);
+
+/*
+ * Class:     org_vesalainen_dev_FileIO
  * Method:    close
  * Signature: (I)V
  */

@@ -51,7 +51,7 @@ JNIEXPORT void JNICALL Java_org_vesalainen_dev_i2c_I2CSMBus_writeByte
 {
     if (i2c_smbus_write_byte(fd, b) < 0)
     {
-        EXCEPTIONV("writeByte(0x%x)", b);
+        EXCEPTIONV("writeByte(%#x)", b);
     }
 }
 JNIEXPORT jbyte JNICALL Java_org_vesalainen_dev_i2c_I2CSMBus_readByteData

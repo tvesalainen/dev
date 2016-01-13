@@ -26,6 +26,7 @@ import org.vesalainen.loader.LibraryLoader;
  */
 public class FileIO implements AutoCloseable
 {
+    protected static boolean debug;
     protected byte[] path;
     protected int fd;
 
@@ -71,6 +72,13 @@ public class FileIO implements AutoCloseable
         close(fd);
     }
 
+    public static void setDebug(boolean debug)
+    {
+        FileIO.debug = debug;
+        debug(debug);
+    }
+    private static native void debug(boolean debug);
+    
     private native void close(int fd) throws IOException;
     /**
      * Reads one byte

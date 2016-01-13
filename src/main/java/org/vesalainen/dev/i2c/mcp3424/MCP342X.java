@@ -78,9 +78,42 @@ public class MCP342X
         {
             buf = new byte[3];
         }
-        int len = slave.readBlockData(config, buf);
+        int len = slave.read(buf);
+        while (isSet(buf[buf.length-1], 7))
+        {
+            len = slave.read(buf);
+        }
         System.err.println("len="+len+" "+Arrays.toString(buf));
-        return 0;
+        return getVoltage(buf);
+    }
+    public double getVoltage(byte... buf)
+    {
+        double sign=1;
+        if (isSet(buf[0], 7))
+        {
+            sign = -1;
+        }
+        double value = 0;
+        int i0 = buf[0] & 0xff;
+        int i1 = buf[1] & 0xff;
+        int i2 = buf[2] & 0xff;
+        int res = get2Bit(2);
+        switch (res)
+        {
+            case 0: // 12
+                value = ((0b111 & i0)<<8)+i1;
+                break;
+            case 1: // 14
+                value = ((0b11111 & i0)<<8)+i1;
+                break;
+            case 2: // 16
+                value = ((0b1111111 & i0)<<8)+i1;
+                break;
+            case 3: // 18
+                value = ((0b1 & i0)<<16)+(i1<<8)+i2;
+                break;
+        }
+        return sign*value*LSB[res]/PGA[get2Bit(0)];
     }
     public byte getConfig()
     {
@@ -152,9 +185,15 @@ public class MCP342X
     {
         return Gain.values()[get2Bit(0)];
     }
+    
     public double getPGA()
     {
         return PGA[get2Bit(0)]; 
+    }
+    
+    public double getLSB()
+    {
+        return LSB[get2Bit(2)]; 
     }
     
     protected void set(int bit, boolean value)

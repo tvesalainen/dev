@@ -43,6 +43,7 @@ JNIEXPORT jint JNICALL Java_org_vesalainen_dev_FileIO_open
     strncpy(szPath, sPath, size);
     
     fd = open(szPath, O_RDWR);
+    DEBUG("open(%s) -> %d\n", szPath, fd);
     (*env)->ReleaseByteArrayElements(env, path, sPath, 0);
     if (fd < 0)
     {
@@ -56,8 +57,16 @@ JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_close
 {
     if (close(fd) < 0)
     {
-        EXCEPTIONV("close()");
+        EXCEPTIONV("close(%d)", fd);
     }
+    DEBUG("close(%d)\n", fd);
+}
+
+JNIEXPORT void JNICALL Java_org_vesalainen_dev_FileIO_debug
+  (JNIEnv *env, jclass cls, jboolean deb)
+{
+    debug = deb;
+    DEBUG("debug(%d)\n", deb);
 }
 
 JNIEXPORT jbyte JNICALL Java_org_vesalainen_dev_FileIO_read__I
