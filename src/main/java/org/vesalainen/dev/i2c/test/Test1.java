@@ -22,9 +22,10 @@ import java.util.logging.Logger;
 import org.vesalainen.dev.FileIO;
 import org.vesalainen.dev.i2c.I2CAdapter;
 import org.vesalainen.dev.i2c.I2CSMBus;
-import org.vesalainen.dev.i2c.mcp3424.MCP342X;
-import org.vesalainen.dev.i2c.mcp3424.MCP342X.Gain;
-import org.vesalainen.dev.i2c.mcp3424.MCP342X.Resolution;
+import org.vesalainen.dev.i2c.mcp342X.MCP3422;
+import org.vesalainen.dev.i2c.mcp342X.MCP342X;
+import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
+import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
 
 /**
  *
@@ -49,7 +50,7 @@ public class Test1
     {
         try (I2CSMBus bus = I2CSMBus.open(1))
         {
-            MCP342X mcp = new MCP342X(bus, (short)0x68);
+            MCP3422 mcp = new MCP3422(bus);
             for (int r=0;r<4;r++)
             {
                 Resolution res = Resolution.values()[r];

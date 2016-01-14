@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.vesalainen.dev.i2c.mcp3424;
+package org.vesalainen.dev.i2c.mcp342X;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -27,18 +27,20 @@ import org.vesalainen.dev.i2c.I2CSlave;
  */
 public class MCP342X
 {
+
     public enum SampleRate {SPS240, SPS60, SPS15, SPS3_75};
     public enum Resolution {Bits12, Bits14, Bits16, Bits18};
     public enum Gain {X1, X2, X4, X8}
 
-    protected static final double Vref = 2.048;
-    protected static final double[] PGA = new double[] {1.0, 2.0, 4.0, 8.0};
-    protected static final double[] LSB = new double[4];
-    protected static final int[] MaxCode = new int[4];
-    protected static final int[] MinCode = new int[4];
+    public static final double Vref = 2.048;
+    public static final double[] PGA = new double[] {1.0, 2.0, 4.0, 8.0};
+    public static final double[] LSB = new double[4];
+    public static final int[] MaxCode = new int[4];
+    public static final int[] MinCode = new int[4];
     protected I2CSMBus bus;
     protected I2CSlave slave;
     protected byte config;
+    protected int channelCount = 2;
 
     static
     {
@@ -50,18 +52,56 @@ public class MCP342X
             MinCode[ii] = (int) -Math.pow(2, bits-1);
         }
     }
-    public MCP342X()
+    MCP342X()
     {
     }
 
-    public MCP342X(I2CSMBus bus, short slaveAddress) throws IOException
+    public MCP342X(int channelCount, I2CSMBus bus, short slaveAddress) throws IOException
     {
+        checkSlaveAddress(slaveAddress);
+        this.channelCount = channelCount;
         this.bus = bus;
         this.slave = bus.createSlave(slaveAddress);
     }
-
+    /**
+     * Creates channel
+     * @param channel
+     * @param resolution
+     * @param gain
+     * @return 
+     */
+    public MCP342XChannel getChannel(int channel, Resolution resolution, Gain gain)
+    {
+        checkChannel(channel);
+        return new MCP342XStandardChannel(this, channel, resolution, gain);
+    }
+    /**
+     * Creates optimized channel. Optimized channel tries to get measurement
+     * @param channel
+     * @param resolution
+     * @param gain
+     * @return 
+     */
+    public MCP342XChannel getOptimizingChannel(int channel, Resolution resolution, Gain gain)
+    {
+        checkChannel(channel);
+        return new MCP342XOptimizingChannel(this, channel);
+    }
+    /**
+     * Returns -2.048 - 2.048 or positive/negative infinity
+     * @param channel
+     * @param resolution
+     * @param gain
+     * @return
+     * @throws IOException 
+     */
     public double measure(int channel, Resolution resolution, Gain gain) throws IOException
     {
+        return rawMeasure(channel, resolution, gain)/PGA[get2Bit(0)];
+    }
+    double rawMeasure(int channel, Resolution resolution, Gain gain) throws IOException
+    {
+        checkChannel(channel);
         setContinousConversion(false);
         setReady(true);
         setChannel(channel);
@@ -84,36 +124,60 @@ public class MCP342X
             len = slave.read(buf);
         }
         System.err.println("len="+len+" "+Arrays.toString(buf));
-        return getVoltage(buf);
+        return getRawVoltage(buf);
     }
-    public double getVoltage(byte... buf)
+    double getVoltage(byte... buf)
+    {
+        return getRawVoltage(buf)/PGA[get2Bit(0)];
+    }
+    double getRawVoltage(byte... buf)
     {
         double sign=1;
-        if (isSet(buf[0], 7))
-        {
-            sign = -1;
-        }
-        double value = 0;
-        int i0 = buf[0] & 0xff;
-        int i1 = buf[1] & 0xff;
-        int i2 = buf[2] & 0xff;
+        int value = 0;
         int res = get2Bit(2);
         switch (res)
         {
             case 0: // 12
-                value = ((0b111 & i0)<<8)+i1;
+                if (isSet(buf[0], 3))
+                {
+                    sign = -1;
+                }
+                value = ((0b111 & (buf[0] & 0xff))<<8)+(buf[1] & 0xff);
                 break;
             case 1: // 14
-                value = ((0b11111 & i0)<<8)+i1;
+                if (isSet(buf[0], 5))
+                {
+                    sign = -1;
+                }
+                value = ((0b11111 & (buf[0] & 0xff))<<8)+(buf[1] & 0xff);
                 break;
             case 2: // 16
-                value = ((0b1111111 & i0)<<8)+i1;
+                if (isSet(buf[0], 7))
+                {
+                    sign = -1;
+                }
+                value = ((0b1111111 & (buf[0] & 0xff))<<8)+(buf[1] & 0xff);
                 break;
             case 3: // 18
-                value = ((0b1 & i0)<<16)+(i1<<8)+i2;
+                if (isSet(buf[0], 1))
+                {
+                    sign = -1;
+                }
+                value = ((0b1 & (buf[0] & 0xff))<<16)+((buf[1] & 0xff)<<8)+(buf[2] & 0xff);
                 break;
         }
-        return sign*value*LSB[res]/PGA[get2Bit(0)];
+        if (value == MaxCode[res])
+        {
+            if (sign > 0)
+            {
+                return Double.POSITIVE_INFINITY;
+            }
+            else
+            {
+                return Double.NEGATIVE_INFINITY;
+            }
+        }
+        return sign*value*LSB[res];
     }
     public byte getConfig()
     {
@@ -130,6 +194,7 @@ public class MCP342X
     }
     protected void setChannel(int ch)
     {
+        checkChannel(ch);
         set(6, ch == 3 || ch == 4);
         set(5, ch == 2 || ch == 4);
     }
@@ -222,4 +287,18 @@ public class MCP342X
         return (b & (1 << bit)) != 0;
     }
 
+    private void checkChannel(int channel)
+    {
+        if (channel < 1 || channel > channelCount)
+        {
+            throw new IllegalArgumentException("channel not in range 1 - "+channelCount);
+        }
+    }
+    private void checkSlaveAddress(short slaveAddress)
+    {
+        if ((slaveAddress>>3) != 0b1101)
+        {
+            throw new IllegalArgumentException("slave address not correct "+slaveAddress);
+        }
+    }
 }
