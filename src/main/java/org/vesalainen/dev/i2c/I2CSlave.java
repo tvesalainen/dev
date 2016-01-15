@@ -17,6 +17,7 @@
 package org.vesalainen.dev.i2c;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -24,7 +25,9 @@ import java.io.IOException;
  */
 public class I2CSlave extends I2CSMBus
 {
+
     private final short slave;
+    private final ReentrantLock lock = new ReentrantLock();
 
     I2CSlave(int fd, short slave)
     {
@@ -35,86 +38,271 @@ public class I2CSlave extends I2CSMBus
     @Override
     public short processCall(byte register, short value) throws IOException
     {
-        setAddress(slave);
-        return super.processCall(register, value);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.processCall(register, value);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public void writeBlockData(byte register, byte[] buf, int off, int len) throws IOException
     {
-        setAddress(slave);
-        super.writeBlockData(register, buf, off, len);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.writeBlockData(register, buf, off, len);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public void writeBlockData(byte register, byte[] buf) throws IOException
     {
-        setAddress(slave);
-        super.writeBlockData(register, buf);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.writeBlockData(register, buf);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public int readBlockData(byte register, byte[] buf, int off, int len) throws IOException
     {
-        setAddress(slave);
-        return super.readBlockData(register, buf, off, len);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.readBlockData(register, buf, off, len);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public int readBlockData(byte register, byte[] buf) throws IOException
     {
-        setAddress(slave);
-        return super.readBlockData(register, buf);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.readBlockData(register, buf);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public void writeWordData(byte register, short b) throws IOException
     {
-        setAddress(slave);
-        super.writeWordData(register, b);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.writeWordData(register, b);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public short readWordData(byte register) throws IOException
     {
-        setAddress(slave);
-        return super.readWordData(register);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.readWordData(register);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public void writeByteData(byte register, byte b) throws IOException
     {
-        setAddress(slave);
-        super.writeByteData(register, b);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.writeByteData(register, b);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public byte readByteData(byte register) throws IOException
     {
-        setAddress(slave);
-        return super.readByteData(register);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.readByteData(register);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public void writeByte(byte b) throws IOException
     {
-        setAddress(slave);
-        super.writeByte(b);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.writeByte(b);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public byte readByte() throws IOException
     {
-        setAddress(slave);
-        return super.readByte();
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.readByte();
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
 
     @Override
     public void writeQuick(boolean bit) throws IOException
     {
-        setAddress(slave);
-        super.writeQuick(bit);
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.writeQuick(bit);
+        }
+        finally
+        {
+            lock.unlock();
+        }
     }
-    
-    
+
+    @Override
+    public void write(byte[] buf, int off, int len) throws IOException
+    {
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.write(buf, off, len);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void write(byte... bytes) throws IOException
+    {
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.write(bytes);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public int read(byte[] buf, int off, int len) throws IOException
+    {
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.read(buf, off, len);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public int read(byte[] buf) throws IOException
+    {
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.read(buf);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public void write(byte b) throws IOException
+    {
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            super.write(b);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
+    @Override
+    public byte read() throws IOException
+    {
+        lock.lock();
+        try
+        {
+            setAddress(slave);
+            return super.read();
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+
 }

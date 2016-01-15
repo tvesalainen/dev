@@ -23,10 +23,8 @@ import org.vesalainen.dev.i2c.mcp342X.MCP342XChannel;
  *
  * @author tkv
  */
-public class VoltageDividerChannel implements MCP342XChannel
+public class VoltageDividerChannel extends LineCorrectedChannel
 {
-    private final MCP342XChannel channel;
-    private final double rel;
     /**
      * Creates a VoltageDividerChannel
      * @param channel
@@ -35,14 +33,7 @@ public class VoltageDividerChannel implements MCP342XChannel
      */
     public VoltageDividerChannel(MCP342XChannel channel, double r1, double r2)
     {
-        this.channel = channel;
-        this.rel = (r1+r2)/r2;
+        super(channel, (r1+r2)/r2);
     }
 
-    @Override
-    public double measure() throws IOException
-    {
-        return rel*channel.measure();
-    }
-    
 }

@@ -23,61 +23,87 @@ import org.vesalainen.dev.i2c.mcp342X.MCP342X;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
 import org.vesalainen.dev.i2c.mcp342X.MCP342XChannel;
-import org.vesalainen.dev.i2c.mcp342X.MCP342XStandardChannel;
 
 /**
  *
  * @author tkv
  */
-public class ADCPiV2
+public class ADCPiV2 implements AutoCloseable
 {
-    private final MCP3424 mcp1;
-    private final MCP3424 mcp2;
+    private I2CSMBus smBus;
+    private MCP3424 mcp1;
+    private MCP3424 mcp2;
 
-    private ADCPiV2(MCP3424 mcp1, MCP3424 mcp2)
+    public ADCPiV2(I2CSMBus smBus, MCP3424 mcp1, MCP3424 mcp2)
     {
+        this.smBus = smBus;
         this.mcp1 = mcp1;
         this.mcp2 = mcp2;
     }
-    
+
     public static ADCPiV2 open(int adapter, short slave1, short slave2) throws IOException
     {
         I2CSMBus bus = I2CSMBus.open(adapter);
-        return new ADCPiV2(new MCP3424(bus, slave1), new MCP3424(bus, slave2));
+        return new ADCPiV2(bus, new MCP3424(bus, slave1), new MCP3424(bus, slave2));
     }
     
     public MCP342XChannel getChannel(int channel, MCP342X.Resolution resolution, MCP342X.Gain gain)
     {
-        return getChannel(channel, resolution, gain, 0);
+        return getVoltageDividerChannel(channel, resolution, gain, 0);
     }
-    public MCP342XChannel getChannel(int channel, MCP342X.Resolution resolution, MCP342X.Gain gain, double resistor)
+    public MCP342XChannel getVoltageDividerChannel(int channel, Resolution resolution, Gain gain, double resistor)
+    {
+        return new VoltageDividerChannel(getStdChannel(channel, resolution, gain), 10000.0+resistor, 6800.0);
+    }
+    public MCP342XChannel getLineCorrectedChannel(int channel, Resolution resolution, Gain gain, double... points)
+    {
+        return new LineCorrectedChannel(getStdChannel(channel, resolution, gain), points);
+    }
+    private MCP342XChannel getStdChannel(int channel, Resolution resolution, Gain gain)
+    {
+        if (channel <= 4)
+        {
+            return mcp1.getChannel(channel, resolution, gain);
+        }
+        else
+        {
+            return mcp2.getChannel(channel-4, resolution, gain);
+        }
+    }
+    public MCP342XChannel getOptimizingChannel(int channel)
+    {
+        return getOptimizingVoltageDividerChannel(channel, 0);
+    }
+    public MCP342XChannel getOptimizingVoltageDividerChannel(int channel, double resistor)
+    {
+        return new VoltageDividerChannel(getOptChannel(channel), 10000.0+resistor, 6800.0);
+    }
+
+    public MCP342XChannel getOptimizingLineCorrectedChannel(int channel, double... points)
+    {
+        return new LineCorrectedChannel(getOptChannel(channel), points);
+    }
+    private MCP342XChannel getOptChannel(int channel)
     {
         MCP342XChannel ch;
         if (channel <= 4)
         {
-            ch = mcp1.getChannel(channel, resolution, gain);
+            return mcp1.getOptimizingChannel(channel);
         }
         else
         {
-            ch = mcp2.getChannel(channel, resolution, gain);
+            return mcp2.getOptimizingChannel(channel-4);
         }
-        return new VoltageDividerChannel(ch, 10000.0+resistor, 6800.0);
     }
-    public MCP342XChannel getOptimizingChannel(int channel, Resolution resolution, Gain gain)
+    @Override
+    public void close() throws IOException
     {
-        return getOptimizingChannel(channel, resolution, gain, 0);
-    }
-    public MCP342XChannel getOptimizingChannel(int channel, Resolution resolution, Gain gain, double resistor)
-    {
-        MCP342XChannel ch;
-        if (channel <= 4)
+        if (smBus != null)
         {
-            ch = mcp1.getOptimizingChannel(channel, resolution, gain);
+            smBus.close();
+            smBus = null;
+            mcp1 = null;
+            mcp2 = null;
         }
-        else
-        {
-            ch = mcp2.getOptimizingChannel(channel, resolution, gain);
-        }
-        return new VoltageDividerChannel(ch, 10000.0+resistor, 6800.0);
     }
 }

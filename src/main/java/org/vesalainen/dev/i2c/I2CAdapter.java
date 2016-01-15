@@ -27,7 +27,7 @@ import org.vesalainen.util.EnumSetFlagger;
  */
 public class I2CAdapter extends FileIO
 {
-    protected short slave = -1;
+    protected short lastSlave = -1;
     protected EnumSet<I2CFunctionality> funcs;
     
     protected I2CAdapter(int fd)
@@ -54,15 +54,15 @@ public class I2CAdapter extends FileIO
     static native int openAdapter(int adapter) throws IOException;
     protected native long functionality(int fd) throws IOException;
     /**
-     * Set device slave for following methods
+     * Set device lastSlave for following methods
      * @param address
      * @throws IOException 
      */
     public void setAddress(short address) throws IOException
     {
-        if (this.slave != address)
+        if (this.lastSlave != address)
         {
-            this.slave = address;
+            this.lastSlave = address;
             setAddress(fd, address);
         }
     }

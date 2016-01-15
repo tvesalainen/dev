@@ -17,7 +17,7 @@
 package org.vesalainen.dev.i2c.mcp342X;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.concurrent.locks.ReentrantLock;
 import org.vesalainen.dev.i2c.I2CSMBus;
 import org.vesalainen.dev.i2c.I2CSlave;
 
@@ -41,6 +41,7 @@ public class MCP342X
     protected I2CSlave slave;
     protected byte config;
     protected int channelCount = 2;
+    protected ReentrantLock lock = new ReentrantLock();
 
     static
     {
@@ -54,6 +55,7 @@ public class MCP342X
     }
     MCP342X()
     {
+        this.channelCount = 4;
     }
 
     public MCP342X(int channelCount, I2CSMBus bus, short slaveAddress) throws IOException
@@ -78,11 +80,9 @@ public class MCP342X
     /**
      * Creates optimized channel. Optimized channel tries to get measurement
      * @param channel
-     * @param resolution
-     * @param gain
      * @return 
      */
-    public MCP342XChannel getOptimizingChannel(int channel, Resolution resolution, Gain gain)
+    public MCP342XChannel getOptimizingChannel(int channel)
     {
         checkChannel(channel);
         return new MCP342XOptimizingChannel(this, channel);
@@ -97,33 +97,47 @@ public class MCP342X
      */
     public double measure(int channel, Resolution resolution, Gain gain) throws IOException
     {
-        return rawMeasure(channel, resolution, gain)/PGA[get2Bit(0)];
+        double rm = rawMeasure(channel, resolution, gain)/PGA[get2Bit(0)];
+        System.err.println(getGain());
+        return rm;
     }
     double rawMeasure(int channel, Resolution resolution, Gain gain) throws IOException
     {
         checkChannel(channel);
-        setContinousConversion(false);
-        setReady(true);
-        setChannel(channel);
-        setResolution(resolution);
-        setGain(gain);
-        System.err.println(config);
-        slave.writeByte(config);
         byte[] buf;
-        if (resolution == Resolution.Bits18)
+        lock.lock();
+        try
         {
-            buf = new byte[4];
+            setContinousConversion(false);
+            setReady(true);
+            setChannel(channel);
+            setResolution(resolution);
+            setGain(gain);
+            long n1 = System.nanoTime();
+            slave.writeByte(config);
+            if (resolution == Resolution.Bits18)
+            {
+                buf = new byte[4];
+            }
+            else
+            {
+                buf = new byte[3];
+            }
+            int len = slave.read(buf);
+            int cnt = 0;
+            while (isSet(buf[buf.length-1], 7))
+            {
+                len = slave.read(buf);
+                cnt++;
+            }
+            long n2 = System.nanoTime();
+            long dn = n2-n1;
+            System.err.println("Nanos="+dn+" cnt="+cnt);
         }
-        else
+        finally
         {
-            buf = new byte[3];
+            lock.unlock();
         }
-        int len = slave.read(buf);
-        while (isSet(buf[buf.length-1], 7))
-        {
-            len = slave.read(buf);
-        }
-        System.err.println("len="+len+" "+Arrays.toString(buf));
         return getRawVoltage(buf);
     }
     double getVoltage(byte... buf)

@@ -22,10 +22,12 @@ import java.util.logging.Logger;
 import org.vesalainen.dev.FileIO;
 import org.vesalainen.dev.i2c.I2CAdapter;
 import org.vesalainen.dev.i2c.I2CSMBus;
+import org.vesalainen.dev.i2c.adcpi.ADCPiV2;
 import org.vesalainen.dev.i2c.mcp342X.MCP3422;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
+import org.vesalainen.dev.i2c.mcp342X.MCP342XChannel;
 
 /**
  *
@@ -67,10 +69,48 @@ public class Test1
             Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    public static void test3()
+    {
+        
+        try (ADCPiV2 adcpi = ADCPiV2.open(1, (short)0x68, (short)0x69))
+        {
+            MCP342XChannel cursens = adcpi.getOptimizingChannel(1);
+            MCP342XChannel bat = adcpi.getOptimizingVoltageDividerChannel(2, 56000.0);
+            MCP342XChannel startBat = adcpi.getVoltageDividerChannel(3, Resolution.Bits18, Gain.X1, 56000.0);
+            MCP342XChannel panel = adcpi.getOptimizingVoltageDividerChannel(4, 68000.0);
+            System.err.printf("cur=%f ", cursens.measure());
+            System.err.printf("bat=%f ", bat.measure());
+            System.err.printf("str=%f ", startBat.measure());
+            System.err.printf("pan=%f ", panel.measure());
+            System.err.println();
+        }
+        catch (IOException ex)
+        {
+            Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    public static void test4()
+    {
+        
+        try (ADCPiV2 adcpi = ADCPiV2.open(1, (short)0x68, (short)0x69))
+        {
+            MCP342XChannel cursens = adcpi.getLineCorrectedChannel(1, Resolution.Bits18, Gain.X1, 2.44, 0, 4.88, 40);
+            for (int ii=0;ii<100;ii++)
+            {
+                System.err.printf("cur=%f ", cursens.measure());
+                System.err.println();
+            }
+        }
+        catch (IOException ex)
+        {
+            Logger.getLogger(Test1.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
     public static void main(String... args)
     {
         FileIO.setDebug(true);
-        test1();
-        test2();
+        //test1();
+        //test2();
+        test4();
     }
 }
