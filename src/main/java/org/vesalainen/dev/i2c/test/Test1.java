@@ -27,7 +27,7 @@ import org.vesalainen.dev.i2c.mcp342X.MCP3422;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
-import org.vesalainen.dev.i2c.mcp342X.MCP342XChannel;
+import org.vesalainen.dev.VoltageSource;
 
 /**
  *
@@ -74,14 +74,16 @@ public class Test1
         
         try (ADCPiV2 adcpi = ADCPiV2.open(1, (short)0x68, (short)0x69))
         {
-            MCP342XChannel cursens = adcpi.getOptimizingChannel(1);
-            MCP342XChannel bat = adcpi.getOptimizingVoltageDividerChannel(2, 56000.0);
-            MCP342XChannel startBat = adcpi.getVoltageDividerChannel(3, Resolution.Bits18, Gain.X1, 56000.0);
-            MCP342XChannel panel = adcpi.getOptimizingVoltageDividerChannel(4, 68000.0);
-            System.err.printf("cur=%f ", cursens.measure());
-            System.err.printf("bat=%f ", bat.measure());
-            System.err.printf("str=%f ", startBat.measure());
-            System.err.printf("pan=%f ", panel.measure());
+            VoltageSource curRef = adcpi.getOptimizingLineCorrectedChannel(1, 1.9944375, 4.93);
+            VoltageSource bat = adcpi.getLineCorrectedChannel(2, Resolution.Bits18, Gain.X1, 1.017125, 12.06);
+            VoltageSource startBat = adcpi.getOptimizingLineCorrectedChannel(3, 1.036859375, 12.06);
+            VoltageSource panel = adcpi.getLineCorrectedChannel(4, Resolution.Bits18, Gain.X1, 0.913046875, 12.06);
+            VoltageSource cur = adcpi.getOptimizingLineCorrectedChannel(5, 1.9944375, 4.93);
+            System.err.printf("ref=%f ", curRef.voltage());
+            System.err.printf("cur=%f ", cur.voltage());
+            System.err.printf("bat=%f ", bat.voltage());
+            System.err.printf("str=%f ", startBat.voltage());
+            System.err.printf("pan=%f ", panel.voltage());
             System.err.println();
         }
         catch (IOException ex)
@@ -94,10 +96,10 @@ public class Test1
         
         try (ADCPiV2 adcpi = ADCPiV2.open(1, (short)0x68, (short)0x69))
         {
-            MCP342XChannel cursens = adcpi.getLineCorrectedChannel(1, Resolution.Bits18, Gain.X1, 2.44, 0, 4.88, 40);
+            VoltageSource cursens = adcpi.getLineCorrectedChannel(1, Resolution.Bits18, Gain.X1, 2.44, 0, 4.88, 40);
             for (int ii=0;ii<100;ii++)
             {
-                System.err.printf("cur=%f ", cursens.measure());
+                System.err.printf("cur=%f ", cursens.voltage());
                 System.err.println();
             }
         }
@@ -111,6 +113,6 @@ public class Test1
         FileIO.setDebug(true);
         //test1();
         //test2();
-        test4();
+        test3();
     }
 }

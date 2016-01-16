@@ -22,7 +22,7 @@ import org.vesalainen.dev.i2c.mcp342X.MCP3424;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
-import org.vesalainen.dev.i2c.mcp342X.MCP342XChannel;
+import org.vesalainen.dev.VoltageSource;
 
 /**
  *
@@ -47,19 +47,19 @@ public class ADCPiV2 implements AutoCloseable
         return new ADCPiV2(bus, new MCP3424(bus, slave1), new MCP3424(bus, slave2));
     }
     
-    public MCP342XChannel getChannel(int channel, MCP342X.Resolution resolution, MCP342X.Gain gain)
+    public VoltageSource getChannel(int channel, MCP342X.Resolution resolution, MCP342X.Gain gain)
     {
         return getVoltageDividerChannel(channel, resolution, gain, 0);
     }
-    public MCP342XChannel getVoltageDividerChannel(int channel, Resolution resolution, Gain gain, double resistor)
+    public VoltageSource getVoltageDividerChannel(int channel, Resolution resolution, Gain gain, double resistor)
     {
         return new VoltageDividerChannel(getStdChannel(channel, resolution, gain), 10000.0+resistor, 6800.0);
     }
-    public MCP342XChannel getLineCorrectedChannel(int channel, Resolution resolution, Gain gain, double... points)
+    public VoltageSource getLineCorrectedChannel(int channel, Resolution resolution, Gain gain, double... points)
     {
         return new LineCorrectedChannel(getStdChannel(channel, resolution, gain), points);
     }
-    private MCP342XChannel getStdChannel(int channel, Resolution resolution, Gain gain)
+    private VoltageSource getStdChannel(int channel, Resolution resolution, Gain gain)
     {
         if (channel <= 4)
         {
@@ -70,22 +70,22 @@ public class ADCPiV2 implements AutoCloseable
             return mcp2.getChannel(channel-4, resolution, gain);
         }
     }
-    public MCP342XChannel getOptimizingChannel(int channel)
+    public VoltageSource getOptimizingChannel(int channel)
     {
         return getOptimizingVoltageDividerChannel(channel, 0);
     }
-    public MCP342XChannel getOptimizingVoltageDividerChannel(int channel, double resistor)
+    public VoltageSource getOptimizingVoltageDividerChannel(int channel, double resistor)
     {
         return new VoltageDividerChannel(getOptChannel(channel), 10000.0+resistor, 6800.0);
     }
 
-    public MCP342XChannel getOptimizingLineCorrectedChannel(int channel, double... points)
+    public VoltageSource getOptimizingLineCorrectedChannel(int channel, double... points)
     {
         return new LineCorrectedChannel(getOptChannel(channel), points);
     }
-    private MCP342XChannel getOptChannel(int channel)
+    private VoltageSource getOptChannel(int channel)
     {
-        MCP342XChannel ch;
+        VoltageSource ch;
         if (channel <= 4)
         {
             return mcp1.getOptimizingChannel(channel);

@@ -14,26 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.vesalainen.dev.i2c.adcpi;
-
-import java.io.IOException;
-import org.vesalainen.dev.VoltageSource;
+package org.vesalainen.dev.i2c.gcbc;
 
 /**
  *
  * @author tkv
  */
-public class VoltageDividerChannel extends LineCorrectedChannel
+public class GCBC0401A
 {
-    /**
-     * Creates a VoltageDividerChannel
-     * @param channel
-     * @param r1 Resistor in ohms to measured voltage
-     * @param r2 Resistor in ohms to ground
-     */
-    public VoltageDividerChannel(VoltageSource channel, double r1, double r2)
-    {
-        super(channel, (r1+r2)/r2);
-    }
-
+    
 }

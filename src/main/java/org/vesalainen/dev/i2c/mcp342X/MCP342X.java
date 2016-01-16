@@ -16,8 +16,11 @@
  */
 package org.vesalainen.dev.i2c.mcp342X;
 
+import org.vesalainen.dev.VoltageSource;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.vesalainen.dev.i2c.I2CSMBus;
 import org.vesalainen.dev.i2c.I2CSlave;
 
@@ -37,11 +40,13 @@ public class MCP342X
     public static final double[] LSB = new double[4];
     public static final int[] MaxCode = new int[4];
     public static final int[] MinCode = new int[4];
+    public static final long[] Delay = new long[] {(long)Math.ceil(1000.0/240.0), (long)Math.ceil(1000.0/60.0), (long)Math.ceil(1000.0/15.0), (long)Math.ceil(1000.0/3.75)};
     protected I2CSMBus bus;
     protected I2CSlave slave;
     protected byte config;
     protected int channelCount = 2;
     protected ReentrantLock lock = new ReentrantLock();
+    protected byte[] buf = new byte[32];
 
     static
     {
@@ -72,7 +77,7 @@ public class MCP342X
      * @param gain
      * @return 
      */
-    public MCP342XChannel getChannel(int channel, Resolution resolution, Gain gain)
+    public VoltageSource getChannel(int channel, Resolution resolution, Gain gain)
     {
         checkChannel(channel);
         return new MCP342XStandardChannel(this, channel, resolution, gain);
@@ -82,7 +87,7 @@ public class MCP342X
      * @param channel
      * @return 
      */
-    public MCP342XChannel getOptimizingChannel(int channel)
+    public VoltageSource getOptimizingChannel(int channel)
     {
         checkChannel(channel);
         return new MCP342XOptimizingChannel(this, channel);
@@ -104,7 +109,6 @@ public class MCP342X
     double rawMeasure(int channel, Resolution resolution, Gain gain) throws IOException
     {
         checkChannel(channel);
-        byte[] buf;
         lock.lock();
         try
         {
@@ -115,25 +119,21 @@ public class MCP342X
             setGain(gain);
             long n1 = System.nanoTime();
             slave.writeByte(config);
-            if (resolution == Resolution.Bits18)
-            {
-                buf = new byte[4];
-            }
-            else
-            {
-                buf = new byte[3];
-            }
+            Thread.sleep(Delay[resolution.ordinal()]);
             int len = slave.read(buf);
             int cnt = 0;
-            while (isSet(buf[buf.length-1], 7))
+            while (isSet(buf[len-1], 7))
             {
                 len = slave.read(buf);
                 cnt++;
             }
             long n2 = System.nanoTime();
             long dn = n2-n1;
-            System.err.println("Nanos="+dn+" cnt="+cnt);
         }
+        catch (InterruptedException ex)
+        {
+            throw new IOException(ex);
+        }        
         finally
         {
             lock.unlock();

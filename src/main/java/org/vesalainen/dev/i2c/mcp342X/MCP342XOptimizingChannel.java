@@ -35,19 +35,19 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
     }
 
     /**
-     * Return measure. Gain is altered to get measurement  greater than Vref/3.
+     * Return voltage. Gain is altered to get measurement  greater than Vref/3.
      * @return
      * @throws IOException 
      */
     @Override
-    public double measure() throws IOException
+    public double voltage() throws IOException
     {
         double voltage = mcp342x.rawMeasure(channel, resolution, gain);
         if (Double.isInfinite(voltage))
         {
             if (decGain())
             {
-                return measure();
+                return voltage();
             }
             else
             {
@@ -58,7 +58,7 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
         {
             if (incGain())
             {
-                return measure();
+                return voltage();
             }
         }
         return voltage/mcp342x.getPGA();
@@ -73,6 +73,7 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
         else
         {
             gain = Gain.values()[gain.ordinal()+1];
+            System.err.println("gain -> "+gain);
             return true;
         }
     }
@@ -85,6 +86,7 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
         else
         {
             gain = Gain.values()[gain.ordinal()-1];
+            System.err.println("gain -> "+gain);
             return true;
         }
     }

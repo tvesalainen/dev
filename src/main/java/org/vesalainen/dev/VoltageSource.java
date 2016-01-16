@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.vesalainen.dev.i2c.mcp342X;
+package org.vesalainen.dev;
 
 import java.io.IOException;
 
@@ -22,14 +22,14 @@ import java.io.IOException;
  *
  * @author tkv
  */
-public interface MCP342XChannel
+public interface VoltageSource
 {
 
     /**
-     * Return measure.
+     * Return voltage.
      * @return
      * @throws IOException
      */
-    double measure() throws IOException;
+    double voltage() throws IOException;
     
 }

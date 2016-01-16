@@ -17,7 +17,7 @@
 package org.vesalainen.dev.i2c.adcpi;
 
 import java.io.IOException;
-import org.vesalainen.dev.i2c.mcp342X.MCP342XChannel;
+import org.vesalainen.dev.VoltageSource;
 import org.vesalainen.math.AbstractLine;
 import org.vesalainen.math.Line;
 
@@ -27,12 +27,12 @@ import org.vesalainen.math.Line;
  * <p>Line is given by 1 or 2 points. 1 point version goes through (0, 0) 
  * @author tkv
  */
-public class LineCorrectedChannel implements MCP342XChannel
+public class LineCorrectedChannel implements VoltageSource
 {
-    protected final MCP342XChannel channel;
+    protected final VoltageSource channel;
     protected final Line line;
 
-    public LineCorrectedChannel(MCP342XChannel channel, double slope)
+    public LineCorrectedChannel(VoltageSource channel, double slope)
     {
         this.channel = channel;
         this.line = new AbstractLine(slope, 0, 0);
@@ -43,7 +43,7 @@ public class LineCorrectedChannel implements MCP342XChannel
      * @param channel
      * @param points x, y or x1, y1, x2, y2
      */
-    public LineCorrectedChannel(MCP342XChannel channel, double... points)
+    public LineCorrectedChannel(VoltageSource channel, double... points)
     {
         this.channel = channel;
         switch (points.length)
@@ -60,9 +60,9 @@ public class LineCorrectedChannel implements MCP342XChannel
     }
 
     @Override
-    public double measure() throws IOException
+    public double voltage() throws IOException
     {
-        double measure = channel.measure();
+        double measure = channel.voltage();
         System.err.println("mea="+measure+" rel="+line);
         return line.getY(measure);
     }
