@@ -58,6 +58,11 @@ public class FileIO implements AutoCloseable
         fio.open();
         return fio;
     }
+
+    public int getFd()
+    {
+        return fd;
+    }
     
     protected void open() throws IOException
     {

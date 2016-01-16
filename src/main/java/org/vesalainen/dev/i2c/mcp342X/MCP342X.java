@@ -19,8 +19,6 @@ package org.vesalainen.dev.i2c.mcp342X;
 import org.vesalainen.dev.VoltageSource;
 import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.vesalainen.dev.i2c.I2CSMBus;
 import org.vesalainen.dev.i2c.I2CSlave;
 
@@ -103,7 +101,6 @@ public class MCP342X
     public double measure(int channel, Resolution resolution, Gain gain) throws IOException
     {
         double rm = rawMeasure(channel, resolution, gain)/PGA[get2Bit(0)];
-        System.err.println(getGain());
         return rm;
     }
     double rawMeasure(int channel, Resolution resolution, Gain gain) throws IOException
@@ -117,18 +114,13 @@ public class MCP342X
             setChannel(channel);
             setResolution(resolution);
             setGain(gain);
-            long n1 = System.nanoTime();
             slave.writeByte(config);
             Thread.sleep(Delay[resolution.ordinal()]);
             int len = slave.read(buf);
-            int cnt = 0;
             while (isSet(buf[len-1], 7))
             {
                 len = slave.read(buf);
-                cnt++;
             }
-            long n2 = System.nanoTime();
-            long dn = n2-n1;
         }
         catch (InterruptedException ex)
         {

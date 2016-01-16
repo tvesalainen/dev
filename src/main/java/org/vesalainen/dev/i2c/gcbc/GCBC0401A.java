@@ -16,11 +16,33 @@
  */
 package org.vesalainen.dev.i2c.gcbc;
 
+import java.io.IOException;
+import org.vesalainen.dev.VoltageSource;
+import org.vesalainen.math.AbstractLine;
+import org.vesalainen.math.Line;
+
 /**
  *
  * @author tkv
  */
 public class GCBC0401A
 {
+    private final VoltageSource reference;
+    private final VoltageSource measured;
+    private final AbstractLine line;
+
+    public GCBC0401A(VoltageSource reference, VoltageSource measured)
+    {
+        this.reference = reference;
+        this.measured = measured;
+        this.line = new AbstractLine(2.5, 0, 4.5, 40.0);
+    }
     
+    public double current() throws IOException
+    {
+        double ref = reference.voltage();
+        double mea = measured.voltage();
+        line.set(ref/2.0, 0, ref+2.0, 40.0);
+        return line.getY(mea);
+    }
 }

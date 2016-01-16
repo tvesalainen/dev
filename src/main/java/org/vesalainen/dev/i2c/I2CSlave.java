@@ -25,13 +25,14 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class I2CSlave extends I2CSMBus
 {
-
+    private final I2CSMBus bus;
     private final short slave;
     private final ReentrantLock lock = new ReentrantLock();
 
-    I2CSlave(int fd, short slave)
+    I2CSlave(I2CSMBus bus, short slave)
     {
-        super(fd);
+        super(bus.getFd());
+        this.bus = bus;
         this.slave = slave;
     }
 
@@ -41,7 +42,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.processCall(register, value);
         }
         finally
@@ -56,7 +57,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.writeBlockData(register, buf, off, len);
         }
         finally
@@ -71,7 +72,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.writeBlockData(register, buf);
         }
         finally
@@ -86,7 +87,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.readBlockData(register, buf, off, len);
         }
         finally
@@ -101,7 +102,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.readBlockData(register, buf);
         }
         finally
@@ -116,7 +117,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.writeWordData(register, b);
         }
         finally
@@ -131,7 +132,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.readWordData(register);
         }
         finally
@@ -146,7 +147,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.writeByteData(register, b);
         }
         finally
@@ -161,7 +162,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.readByteData(register);
         }
         finally
@@ -176,7 +177,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.writeByte(b);
         }
         finally
@@ -191,7 +192,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.readByte();
         }
         finally
@@ -206,7 +207,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.writeQuick(bit);
         }
         finally
@@ -221,7 +222,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.write(buf, off, len);
         }
         finally
@@ -236,7 +237,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.write(bytes);
         }
         finally
@@ -251,7 +252,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.read(buf, off, len);
         }
         finally
@@ -266,7 +267,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.read(buf);
         }
         finally
@@ -281,7 +282,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             super.write(b);
         }
         finally
@@ -296,7 +297,7 @@ public class I2CSlave extends I2CSMBus
         lock.lock();
         try
         {
-            setAddress(slave);
+            bus.setAddress(slave);
             return super.read();
         }
         finally

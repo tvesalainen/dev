@@ -49,7 +49,7 @@ public class I2CSMBus extends I2CAdapter
     
     public I2CSlave createSlave(short slaveAddress) throws IOException
     {
-        I2CSlave slave = new I2CSlave(fd, slaveAddress);
+        I2CSlave slave = new I2CSlave(this, slaveAddress);
         long functionality = slave.functionality(fd);
         slave.funcs = EnumSetFlagger.getSet(I2CFunctionality.class, functionality);
         return slave;

@@ -63,7 +63,6 @@ public class LineCorrectedChannel implements VoltageSource
     public double voltage() throws IOException
     {
         double measure = channel.voltage();
-        System.err.println("mea="+measure+" rel="+line);
         return line.getY(measure);
     }
     

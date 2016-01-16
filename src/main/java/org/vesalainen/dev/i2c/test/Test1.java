@@ -28,6 +28,7 @@ import org.vesalainen.dev.i2c.mcp342X.MCP342X;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
 import org.vesalainen.dev.VoltageSource;
+import org.vesalainen.dev.i2c.gcbc.GCBC0401A;
 
 /**
  *
@@ -75,12 +76,12 @@ public class Test1
         try (ADCPiV2 adcpi = ADCPiV2.open(1, (short)0x68, (short)0x69))
         {
             VoltageSource curRef = adcpi.getOptimizingLineCorrectedChannel(1, 1.9944375, 4.93);
+            VoltageSource cur = adcpi.getOptimizingLineCorrectedChannel(5, 1.9944375, 4.93);
+            GCBC0401A gcbc = new GCBC0401A(curRef, cur);
             VoltageSource bat = adcpi.getLineCorrectedChannel(2, Resolution.Bits18, Gain.X1, 1.017125, 12.06);
             VoltageSource startBat = adcpi.getOptimizingLineCorrectedChannel(3, 1.036859375, 12.06);
             VoltageSource panel = adcpi.getLineCorrectedChannel(4, Resolution.Bits18, Gain.X1, 0.913046875, 12.06);
-            VoltageSource cur = adcpi.getOptimizingLineCorrectedChannel(5, 1.9944375, 4.93);
-            System.err.printf("ref=%f ", curRef.voltage());
-            System.err.printf("cur=%f ", cur.voltage());
+            System.err.printf("cur=%f ", gcbc.current());
             System.err.printf("bat=%f ", bat.voltage());
             System.err.printf("str=%f ", startBat.voltage());
             System.err.printf("pan=%f ", panel.voltage());
