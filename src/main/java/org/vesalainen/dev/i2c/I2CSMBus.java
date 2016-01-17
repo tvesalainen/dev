@@ -17,14 +17,16 @@
 package org.vesalainen.dev.i2c;
 
 import java.io.IOException;
+import java.util.concurrent.locks.ReentrantLock;
 import org.vesalainen.util.EnumSetFlagger;
 
 /**
  *
  * @author tkv
  */
-public class I2CSMBus extends I2CAdapter
+public class I2CSMBus extends I2CAdapter implements SMBus
 {
+    private final ReentrantLock lock = new ReentrantLock();
 
     protected I2CSMBus(int fd)
     {
@@ -50,15 +52,20 @@ public class I2CSMBus extends I2CAdapter
     public I2CSlave createSlave(short slaveAddress) throws IOException
     {
         I2CSlave slave = new I2CSlave(this, slaveAddress);
-        long functionality = slave.functionality(fd);
-        slave.funcs = EnumSetFlagger.getSet(I2CFunctionality.class, functionality);
         return slave;
     }
+
+    public ReentrantLock getLock()
+    {
+        return lock;
+    }
+    
     /**
      * This sends a single bit to the device
      * @param bit
      * @throws IOException 
      */
+    @Override
     public void writeQuick(boolean bit) throws IOException
     {
         check(I2CFunctionality.SMBusQuick);
@@ -73,6 +80,7 @@ public class I2CSMBus extends I2CAdapter
      * @return
      * @throws IOException 
      */
+    @Override
     public byte readByte() throws IOException
     {
         check(I2CFunctionality.SMBusReadByte);
@@ -85,6 +93,7 @@ public class I2CSMBus extends I2CAdapter
      * @param b
      * @throws IOException 
      */
+    @Override
     public void writeByte(byte b) throws IOException
     {
         check(I2CFunctionality.SMBusWriteByte);
@@ -97,6 +106,7 @@ public class I2CSMBus extends I2CAdapter
      * @return
      * @throws IOException 
      */
+    @Override
     public byte readByteData(byte register) throws IOException
     {
         check(I2CFunctionality.SMBusReadByteData);
@@ -110,6 +120,7 @@ public class I2CSMBus extends I2CAdapter
      * @param b
      * @throws IOException 
      */
+    @Override
     public void writeByteData(byte register, byte b) throws IOException
     {
         check(I2CFunctionality.SMBusWriteByteData);
@@ -123,6 +134,7 @@ public class I2CSMBus extends I2CAdapter
      * @return
      * @throws IOException 
      */
+    @Override
     public short readWordData(byte register) throws IOException
     {
         check(I2CFunctionality.SMBusReadWordData);
@@ -136,6 +148,7 @@ public class I2CSMBus extends I2CAdapter
      * @param b
      * @throws IOException 
      */
+    @Override
     public void writeWordData(byte register, short b) throws IOException
     {
         check(I2CFunctionality.SMBusWriteWordData);
@@ -150,6 +163,7 @@ public class I2CSMBus extends I2CAdapter
      * @return
      * @throws IOException 
      */
+    @Override
     public int readBlockData(byte register, byte[] buf) throws IOException
     {
         return readBlockData(register, buf, 0, buf.length);
@@ -164,6 +178,7 @@ public class I2CSMBus extends I2CAdapter
      * @return
      * @throws IOException 
      */
+    @Override
     public int readBlockData(byte register, byte[] buf, int off, int len) throws IOException
     {
         check(I2CFunctionality.SMBusReadBlockData);
@@ -177,6 +192,7 @@ public class I2CSMBus extends I2CAdapter
      * @param buf
      * @throws IOException 
      */
+    @Override
     public void writeBlockData(byte register, byte[] buf) throws IOException
     {
         writeBlockData(register, buf, 0, buf.length);
@@ -190,6 +206,7 @@ public class I2CSMBus extends I2CAdapter
      * @param len
      * @throws IOException 
      */
+    @Override
     public void writeBlockData(byte register, byte[] buf, int off, int len) throws IOException
     {
         check(I2CFunctionality.SMBusWriteBlockData);
@@ -204,6 +221,7 @@ public class I2CSMBus extends I2CAdapter
      * @return
      * @throws IOException 
      */
+    @Override
     public short processCall(byte register, short value) throws IOException
     {
         check(I2CFunctionality.SMBusProcCall);

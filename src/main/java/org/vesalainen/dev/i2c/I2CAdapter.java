@@ -25,7 +25,7 @@ import org.vesalainen.util.EnumSetFlagger;
  *
  * @author tkv
  */
-public class I2CAdapter extends FileIO
+public class I2CAdapter extends FileIO implements I2C
 {
     protected short lastSlave = -1;
     protected EnumSet<I2CFunctionality> funcs;
@@ -58,6 +58,7 @@ public class I2CAdapter extends FileIO
      * @param address
      * @throws IOException 
      */
+    @Override
     public void setAddress(short address) throws IOException
     {
         if (this.lastSlave != address)
@@ -68,6 +69,7 @@ public class I2CAdapter extends FileIO
     }
     private native void setAddress(int fd, short address) throws IOException;
 
+    @Override
     public EnumSet<I2CFunctionality> getFunctionality()
     {
         return funcs;
@@ -77,6 +79,7 @@ public class I2CAdapter extends FileIO
      * @param pec
      * @throws IOException 
      */
+    @Override
     public void setPEC(boolean pec) throws IOException
     {
         check(I2CFunctionality.SMBusPEC);
@@ -88,6 +91,7 @@ public class I2CAdapter extends FileIO
      * @param tenBit
      * @throws IOException 
      */
+    @Override
     public void set10Bit(boolean tenBit) throws IOException
     {
         check(I2CFunctionality.TenBitAddr);

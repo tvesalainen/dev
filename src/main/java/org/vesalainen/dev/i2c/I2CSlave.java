@@ -17,23 +17,24 @@
 package org.vesalainen.dev.i2c;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
  * @author tkv
  */
-public class I2CSlave extends I2CSMBus
+public class I2CSlave implements SMBus
 {
     private final I2CSMBus bus;
     private final short slave;
-    private final ReentrantLock lock = new ReentrantLock();
+    private final ReentrantLock lock;
 
     I2CSlave(I2CSMBus bus, short slave)
     {
-        super(bus.getFd());
         this.bus = bus;
         this.slave = slave;
+        this.lock = bus.getLock();
     }
 
     @Override
@@ -43,7 +44,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.processCall(register, value);
+            return bus.processCall(register, value);
         }
         finally
         {
@@ -58,7 +59,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.writeBlockData(register, buf, off, len);
+            bus.writeBlockData(register, buf, off, len);
         }
         finally
         {
@@ -73,7 +74,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.writeBlockData(register, buf);
+            bus.writeBlockData(register, buf);
         }
         finally
         {
@@ -88,7 +89,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.readBlockData(register, buf, off, len);
+            return bus.readBlockData(register, buf, off, len);
         }
         finally
         {
@@ -103,7 +104,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.readBlockData(register, buf);
+            return bus.readBlockData(register, buf);
         }
         finally
         {
@@ -118,7 +119,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.writeWordData(register, b);
+            bus.writeWordData(register, b);
         }
         finally
         {
@@ -133,7 +134,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.readWordData(register);
+            return bus.readWordData(register);
         }
         finally
         {
@@ -148,7 +149,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.writeByteData(register, b);
+            bus.writeByteData(register, b);
         }
         finally
         {
@@ -163,7 +164,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.readByteData(register);
+            return bus.readByteData(register);
         }
         finally
         {
@@ -178,7 +179,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.writeByte(b);
+            bus.writeByte(b);
         }
         finally
         {
@@ -193,7 +194,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.readByte();
+            return bus.readByte();
         }
         finally
         {
@@ -208,7 +209,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.writeQuick(bit);
+            bus.writeQuick(bit);
         }
         finally
         {
@@ -223,7 +224,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.write(buf, off, len);
+            bus.write(buf, off, len);
         }
         finally
         {
@@ -238,7 +239,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.write(bytes);
+            bus.write(bytes);
         }
         finally
         {
@@ -253,7 +254,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.read(buf, off, len);
+            return bus.read(buf, off, len);
         }
         finally
         {
@@ -268,7 +269,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.read(buf);
+            return bus.read(buf);
         }
         finally
         {
@@ -283,7 +284,7 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            super.write(b);
+            bus.write(b);
         }
         finally
         {
@@ -298,12 +299,36 @@ public class I2CSlave extends I2CSMBus
         try
         {
             bus.setAddress(slave);
-            return super.read();
+            return bus.read();
         }
         finally
         {
             lock.unlock();
         }
+    }
+
+    @Override
+    public EnumSet<I2CFunctionality> getFunctionality()
+    {
+        return bus.getFunctionality();
+    }
+
+    @Override
+    public void set10Bit(boolean tenBit) throws IOException
+    {
+        bus.set10Bit(tenBit);
+    }
+
+    @Override
+    public void setAddress(short address) throws IOException
+    {
+        bus.setAddress(address);
+    }
+
+    @Override
+    public void setPEC(boolean pec) throws IOException
+    {
+        bus.setPEC(pec);
     }
 
 }
