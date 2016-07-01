@@ -75,7 +75,7 @@ public class LibraryLoader
                         lib = lib+"i686";
                         break;
                     case "arm":
-                        lib = lib+"armv6l";
+                        lib = lib+"armv7l";
                         break;
                     default:
                         throw new UnsupportedOperationException(osArch+" not supported");
