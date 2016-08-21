@@ -99,7 +99,7 @@ public class Meter
     
     private void channel(ADCPiV2 adcPiV2, Channel channel)
     {
-        int channelNumber = channel.getChannel();
+        int channelNumber = channel.getChannel()-1; // ADCPiV2 pins are numbered 1 - 8
         String name = channel.getName();
         double resistor = channel.getResistor();
         Mcp342XGain gain = channel.getGain();

@@ -74,8 +74,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     </xsd:simpleType>
     <xsd:simpleType name="adcPiV2Channel">
         <xsd:restriction base="xsd:integer">
-            <xsd:minInclusive value="0"/>
-            <xsd:maxInclusive value="7"/>
+            <xsd:minInclusive value="1"/>
+            <xsd:maxInclusive value="8"/>
         </xsd:restriction>
     </xsd:simpleType>
     <xsd:simpleType name="mcp342xSlaveAddress">
