@@ -14,34 +14,18 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.vesalainen.dev.i2c.gcbc;
-
-import java.io.IOException;
-import org.vesalainen.dev.VoltageSource;
-import org.vesalainen.math.AbstractLine;
+package org.vesalainen.dev.derivates.honeywell;
 
 /**
  *
  * @author tkv
  */
-public class GCBC0401A
+public class CSLH3A9 extends CS
 {
-    private final VoltageSource reference;
-    private final VoltageSource measured;
-    private final AbstractLine line;
-
-    public GCBC0401A(VoltageSource reference, VoltageSource measured)
+    
+    public CSLH3A9()
     {
-        this.reference = reference;
-        this.measured = measured;
-        this.line = new AbstractLine(2.5, 0, 4.5, 40.0);
+        super(9);
     }
     
-    public double current() throws IOException
-    {
-        double ref = reference.getAsDouble();
-        double mea = measured.getAsDouble();
-        line.set(ref/2.0, 0, ref+2.0, 40.0);
-        return line.getY(mea);
-    }
 }

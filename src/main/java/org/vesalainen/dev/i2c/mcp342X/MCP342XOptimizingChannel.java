@@ -36,32 +36,39 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
 
     /**
      * Return voltage. Gain is altered to get measurement  greater than Vref/3.
-     * @return
-     * @throws IOException 
+     * @return 
      */
+    
     @Override
-    public double voltage() throws IOException
+    public double getAsDouble()
     {
-        double voltage = mcp342x.rawMeasure(channel, resolution, gain);
-        if (Double.isInfinite(voltage))
+        try
         {
-            if (decGain())
+            double voltage = mcp342x.rawMeasure(channel, resolution, gain);
+            if (Double.isInfinite(voltage))
             {
-                return voltage();
+                if (decGain())
+                {
+                    return getAsDouble();
+                }
+                else
+                {
+                    return voltage; // -/+ infinity
+                }
             }
-            else
+            if (Math.abs(voltage) < Limit)
             {
-                return voltage; // -/+ infinity
+                if (incGain())
+                {
+                    return getAsDouble();
+                }
             }
+            return voltage/mcp342x.getPGA();
         }
-        if (Math.abs(voltage) < Limit)
+        catch (IOException ex)
         {
-            if (incGain())
-            {
-                return voltage();
-            }
+            throw new RuntimeException(ex);
         }
-        return voltage/mcp342x.getPGA();
     }
     
     private boolean incGain()

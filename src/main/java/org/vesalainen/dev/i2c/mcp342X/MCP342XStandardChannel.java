@@ -18,6 +18,8 @@ package org.vesalainen.dev.i2c.mcp342X;
 
 import org.vesalainen.dev.VoltageSource;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
 
@@ -42,12 +44,18 @@ public class MCP342XStandardChannel implements VoltageSource
 
     /**
      * Return voltage. 
-     * @return
-     * @throws IOException 
+     * @return 
      */
     @Override
-    public double voltage() throws IOException
+    public double getAsDouble()
     {
-        return mcp342x.measure(channel, resolution, gain);
+        try
+        {
+            return mcp342x.measure(channel, resolution, gain);
+        }
+        catch (IOException ex)
+        {
+            throw new RuntimeException(ex);
+        }
     }
 }

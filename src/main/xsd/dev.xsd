@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<!--
+Copyright (C) 2016 tkv
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<xsd:schema version="1.0"
+        xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+        targetNamespace="http://vesalainen.org/schema/dev"
+        xmlns="http://vesalainen.org/schema/dev"
+        elementFormDefault="qualified">
+    <xsd:element name="dev">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element name="i2c" type="i2cType" maxOccurs="unbounded">
+                </xsd:element>
+                <xsd:element name="derivates">
+                    <xsd:complexType>
+                        <xsd:sequence>
+                            <xsd:element name="CSLA1GD" type="honeywellCS" maxOccurs="unbounded"/>
+                            <xsd:element name="CSLH3A9" type="honeywellCS" maxOccurs="unbounded"/>
+                        </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+    <xsd:complexType name="i2cType">
+        <xsd:sequence>
+            <xsd:element name="ADCPiV2" type="ADCPiV2Type" maxOccurs="4">
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="adapter" type="xsd:unsignedShort" use="required"/>
+    </xsd:complexType>
+    <xsd:complexType name="ADCPiV2Type">
+        <xsd:sequence>
+            <xsd:element name="channel" maxOccurs="8">
+                <xsd:complexType>
+                    <xsd:attribute name="channel" type="adcPiV2Channel" use="required"/>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+                    <xsd:attribute name="resistor" type="resistorType" default="0"/>
+                    <xsd:attribute name="resolution" type="mcp342xResolution"/>
+                    <xsd:attribute name="gain" type="mcp342xGain"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="slave1" type="mcp342xSlaveAddress" use="required"/>
+        <xsd:attribute name="slave2" type="mcp342xSlaveAddress" use="required"/>
+    </xsd:complexType>
+    <xsd:complexType name="honeywellCS">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="measureReference" type="xsd:string" use="required"/>
+        <xsd:attribute name="referenceVoltageReference" type="xsd:string"/>
+        <xsd:attribute name="referenceVoltage" type="xsd:double"/>
+        <xsd:attribute name="turns" type="xsd:unsignedInt" default="1"/>
+        <xsd:attribute name="negative" type="xsd:boolean" default="false"/>
+    </xsd:complexType>
+    <xsd:simpleType name="resistorType">
+        <xsd:restriction base="xsd:double">
+            <xsd:minInclusive value="0"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="adcPiV2Channel">
+        <xsd:restriction base="xsd:integer">
+            <xsd:minInclusive value="0"/>
+            <xsd:maxInclusive value="7"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="mcp342xSlaveAddress">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="0x68"/>
+            <xsd:enumeration value="0x69"/>
+            <xsd:enumeration value="0x6A"/>
+            <xsd:enumeration value="0x6B"/>
+            <xsd:enumeration value="0x6C"/>
+            <xsd:enumeration value="0x6D"/>
+            <xsd:enumeration value="0x6E"/>
+            <xsd:enumeration value="0x6F"/>
+            <xsd:enumeration value="0x6a"/>
+            <xsd:enumeration value="0x6b"/>
+            <xsd:enumeration value="0x6c"/>
+            <xsd:enumeration value="0x6d"/>
+            <xsd:enumeration value="0x6e"/>
+            <xsd:enumeration value="0x6f"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="mcp342xResolution">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="Bits12"/>
+            <xsd:enumeration value="Bits14"/>
+            <xsd:enumeration value="Bits16"/>
+            <xsd:enumeration value="Bits18"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="mcp342xGain">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="X1"/>
+            <xsd:enumeration value="X2"/>
+            <xsd:enumeration value="X4"/>
+            <xsd:enumeration value="X8"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+</xsd:schema>

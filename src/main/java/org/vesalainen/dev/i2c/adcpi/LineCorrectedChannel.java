@@ -60,9 +60,9 @@ public class LineCorrectedChannel implements VoltageSource
     }
 
     @Override
-    public double voltage() throws IOException
+    public double getAsDouble()
     {
-        double measure = channel.voltage();
+        double measure = channel.getAsDouble();
         return line.getY(measure);
     }
     

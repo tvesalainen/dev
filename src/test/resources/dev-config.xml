@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dev xmlns="http://vesalainen.org/schema/dev">
+    <i2c adapter="1">
+        <ADCPiV2 slave1="0x68" slave2="0x69">
+            <channel channel="0" name="serviceBat" resistor="12000"/>
+            <channel channel="1" name="batCurrentV" resistor="12000"/>
+        </ADCPiV2>
+    </i2c>
+    <derivates>
+        <CSLA1GD 
+            name="batCurrent" 
+            measureReference="batCurrentV" 
+            referenceVoltageReference="serviceBat"/>
+    </derivates>
+</dev>

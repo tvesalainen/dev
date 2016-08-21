@@ -14,34 +14,34 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.vesalainen.dev.i2c.gcbc;
+package org.vesalainen.dev;
 
+import java.io.File;
 import java.io.IOException;
-import org.vesalainen.dev.VoltageSource;
-import org.vesalainen.math.AbstractLine;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.vesalainen.loader.LibraryLoader;
+import static org.vesalainen.loader.LibraryLoader.OS.Linux;
 
 /**
  *
  * @author tkv
  */
-public class GCBC0401A
+public class MeterTest
 {
-    private final VoltageSource reference;
-    private final VoltageSource measured;
-    private final AbstractLine line;
-
-    public GCBC0401A(VoltageSource reference, VoltageSource measured)
+    
+    public MeterTest()
     {
-        this.reference = reference;
-        this.measured = measured;
-        this.line = new AbstractLine(2.5, 0, 4.5, 40.0);
+    }
+
+    @Test
+    public void test1() throws IOException
+    {
+        if (LibraryLoader.getOS() == Linux)
+        {
+            File file = new File("src/test/resources/dev-config.xml");
+            Meter meter = new Meter(file);
+        }
     }
     
-    public double current() throws IOException
-    {
-        double ref = reference.getAsDouble();
-        double mea = measured.getAsDouble();
-        line.set(ref/2.0, 0, ref+2.0, 40.0);
-        return line.getY(mea);
-    }
 }

@@ -24,7 +24,6 @@ import org.vesalainen.dev.i2c.I2CAdapter;
 import org.vesalainen.dev.i2c.I2CSMBus;
 import org.vesalainen.dev.i2c.adcpi.ADCPiV2;
 import org.vesalainen.dev.i2c.mcp342X.MCP3422;
-import org.vesalainen.dev.i2c.mcp342X.MCP342X;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
 import org.vesalainen.dev.VoltageSource;
@@ -82,9 +81,9 @@ public class Test1
             VoltageSource startBat = adcpi.getOptimizingLineCorrectedChannel(3, 1.036859375, 12.06);
             VoltageSource panel = adcpi.getLineCorrectedChannel(4, Resolution.Bits18, Gain.X1, 0.913046875, 12.06);
             System.err.printf("cur=%f ", gcbc.current());
-            System.err.printf("bat=%f ", bat.voltage());
-            System.err.printf("str=%f ", startBat.voltage());
-            System.err.printf("pan=%f ", panel.voltage());
+            System.err.printf("bat=%f ", bat.getAsDouble());
+            System.err.printf("str=%f ", startBat.getAsDouble());
+            System.err.printf("pan=%f ", panel.getAsDouble());
             System.err.println();
         }
         catch (IOException ex)
@@ -100,7 +99,7 @@ public class Test1
             VoltageSource cursens = adcpi.getLineCorrectedChannel(1, Resolution.Bits18, Gain.X1, 2.44, 0, 4.88, 40);
             for (int ii=0;ii<100;ii++)
             {
-                System.err.printf("cur=%f ", cursens.voltage());
+                System.err.printf("cur=%f ", cursens.getAsDouble());
                 System.err.println();
             }
         }

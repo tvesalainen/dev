@@ -14,34 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.vesalainen.dev.i2c.gcbc;
-
-import java.io.IOException;
-import org.vesalainen.dev.VoltageSource;
-import org.vesalainen.math.AbstractLine;
+package org.vesalainen.dev;
 
 /**
  *
  * @author tkv
  */
-public class GCBC0401A
+public class FixedCurrent implements CurrentSource
 {
-    private final VoltageSource reference;
-    private final VoltageSource measured;
-    private final AbstractLine line;
+    private double current;
 
-    public GCBC0401A(VoltageSource reference, VoltageSource measured)
+    public FixedCurrent(double current)
     {
-        this.reference = reference;
-        this.measured = measured;
-        this.line = new AbstractLine(2.5, 0, 4.5, 40.0);
+        this.current = current;
     }
     
-    public double current() throws IOException
+    @Override
+    public double getAsDouble()
     {
-        double ref = reference.getAsDouble();
-        double mea = measured.getAsDouble();
-        line.set(ref/2.0, 0, ref+2.0, 40.0);
-        return line.getY(mea);
+        return current;
     }
+    
 }

@@ -16,20 +16,12 @@
  */
 package org.vesalainen.dev;
 
-import java.io.IOException;
+import java.util.function.DoubleSupplier;
 
 /**
  *
  * @author tkv
  */
-public interface VoltageSource
+public interface VoltageSource extends DoubleSupplier
 {
-
-    /**
-     * Return voltage.
-     * @return
-     * @throws IOException
-     */
-    double voltage() throws IOException;
-    
 }
