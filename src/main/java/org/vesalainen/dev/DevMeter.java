@@ -19,11 +19,19 @@ package org.vesalainen.dev;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.DoubleSupplier;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.vesalainen.code.PropertySetter;
 import org.vesalainen.dev.derivates.honeywell.CS;
 import org.vesalainen.dev.derivates.honeywell.CSLA1GD;
 import org.vesalainen.dev.derivates.honeywell.CSLH3A9;
@@ -39,16 +47,21 @@ import org.vesalainen.dev.jaxb.I2CType;
 import org.vesalainen.dev.jaxb.Mcp342XGain;
 import org.vesalainen.dev.jaxb.Mcp342XResolution;
 import org.vesalainen.lang.Primitives;
+import org.vesalainen.util.HashMapList;
+import org.vesalainen.util.MapList;
 
 /**
  *
  * @author tkv
  */
-public class Meter
+public class DevMeter
 {
     private Map<String,DoubleSupplier> map = new HashMap<>();
+    private Timer timer;
+    private Map<Long,Task> taskMap = new HashMap<>();
+    private ReentrantLock lock = new ReentrantLock();
 
-    public Meter(File devConfig) throws IOException
+    public DevMeter(File devConfig) throws IOException
     {
         try
         {
@@ -168,4 +181,90 @@ public class Meter
         map.put(name, cs);
     }
 
+    public void register(PropertySetter observer, String property, long period, TimeUnit unit)
+    {
+        lock.lock();
+        try
+        {
+            if (timer == null)
+            {
+                timer = new Timer(DevMeter.class.getSimpleName());
+            }
+            Task task = taskMap.get(period);
+            if (task == null)
+            {
+                task = new Task();
+                timer.scheduleAtFixedRate(task, 100, unit.toMillis(period));
+            }
+            task.add(observer, property);
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+    public void unregister(PropertySetter observer, String property)
+    {
+        lock.lock();
+        try
+        {
+            Iterator<Entry<Long,Task>> it = taskMap.entrySet().iterator();
+            while (it.hasNext())
+            {
+                Entry<Long, Task> e = it.next();
+                Task task = e.getValue();
+                if (task.remove(observer, property))
+                {
+                    if (task.isEmpty())
+                    {
+                        task.cancel();
+                        it.remove();
+                    }
+                    break;
+                }
+            }
+            if (taskMap.isEmpty())
+            {
+                timer.cancel();
+                timer = null;
+            }
+        }
+        finally
+        {
+            lock.unlock();
+        }
+    }
+    private class Task extends TimerTask
+    {
+        private final MapList<String,PropertySetter> mapList = new HashMapList<>();
+        
+        private void add(PropertySetter observer, String property)
+        {
+            mapList.add(property, observer);
+        }
+        private boolean remove(PropertySetter observer, String property)
+        {
+            return mapList.removeItem(property, observer);
+        }
+        private boolean isEmpty()
+        {
+            return mapList.isEmpty();
+        }
+        @Override
+        public void run()
+        {
+            for (Entry<String, List<PropertySetter>> e : mapList.entrySet())
+            {
+                String key = e.getKey();
+                DoubleSupplier supplier = map.get(key);
+                if (supplier == null)
+                {
+                    throw new IllegalArgumentException("no supplier for "+key);
+                }
+                double value = supplier.getAsDouble();
+                e.getValue().stream().forEach((PropertySetter ps)->ps.set(key, value));
+            }
+        }
+        
+    }
 }

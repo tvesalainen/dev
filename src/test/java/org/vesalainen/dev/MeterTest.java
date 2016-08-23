@@ -40,7 +40,7 @@ public class MeterTest
         if (LibraryLoader.getOS() == Linux)
         {
             File file = new File("src/test/resources/dev-config.xml");
-            Meter meter = new Meter(file);
+            DevMeter meter = new DevMeter(file);
         }
     }
     
