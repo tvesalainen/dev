@@ -19,14 +19,10 @@ package org.vesalainen.dev;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.Set;
 import java.util.function.DoubleSupplier;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -47,21 +43,18 @@ import org.vesalainen.dev.jaxb.I2CType;
 import org.vesalainen.dev.jaxb.Mcp342XGain;
 import org.vesalainen.dev.jaxb.Mcp342XResolution;
 import org.vesalainen.lang.Primitives;
-import org.vesalainen.util.HashMapList;
-import org.vesalainen.util.MapList;
+import org.vesalainen.math.Unit;
+import org.vesalainen.math.UnitType;
 
 /**
  *
  * @author tkv
  */
-public class DevMeter
+public class DevMeter extends AbstractMeter
 {
     private Map<String,DoubleSupplier> map = new HashMap<>();
-    private Timer timer;
-    private Map<Long,Task> taskMap = new HashMap<>();
-    private ReentrantLock lock = new ReentrantLock();
 
-    public DevMeter(File devConfig) throws IOException
+    protected DevMeter(File devConfig) throws IOException
     {
         try
         {
@@ -80,15 +73,42 @@ public class DevMeter
         }
     }
 
-    public double meter(String name)
+    @Override
+    public Set<String> getNames()
+    {
+        return map.keySet();
+    }
+
+    @Override
+    public UnitType getUnit(String name)
     {
         DoubleSupplier supplier = map.get(name);
         if (supplier == null)
         {
             throw new IllegalArgumentException(name+" not found");
         }
+        Unit unit = supplier.getClass().getAnnotation(Unit.class);
+        if (unit != null)
+        {
+            return unit.value();
+        }
+        else
+        {
+            return UnitType.Unitless;
+        }
+    }
+
+    @Override
+    public double meter(String name)
+    {
+        DoubleSupplier supplier = map.get(name);
+        if (supplier == null)
+        {
+            throw new IllegalArgumentException(name + " not found");
+        }
         return supplier.getAsDouble();
     }
+
     
     private void i2c(I2CType i2cType) throws IOException
     {
@@ -129,13 +149,16 @@ public class DevMeter
 
     private void derivates(Derivates derivates)
     {
-        for (HoneywellCS cs : derivates.getCSLA1GD())
+        if (derivates != null)
         {
-            populate(new CSLA1GD(), cs);
-        }
-        for (HoneywellCS cs : derivates.getCSLH3A9())
-        {
-            populate(new CSLH3A9(), cs);
+            for (HoneywellCS cs : derivates.getCSLA1GD())
+            {
+                populate(new CSLA1GD(), cs);
+            }
+            for (HoneywellCS cs : derivates.getCSLH3A9())
+            {
+                populate(new CSLH3A9(), cs);
+            }
         }
     }
 
@@ -181,75 +204,14 @@ public class DevMeter
         map.put(name, cs);
     }
 
-    public void register(PropertySetter observer, String property, long period, TimeUnit unit)
+    @Override
+    protected AbstractTask createTask()
     {
-        lock.lock();
-        try
-        {
-            if (timer == null)
-            {
-                timer = new Timer(DevMeter.class.getSimpleName());
-            }
-            Task task = taskMap.get(period);
-            if (task == null)
-            {
-                task = new Task();
-                timer.scheduleAtFixedRate(task, 100, unit.toMillis(period));
-            }
-            task.add(observer, property);
-        }
-        finally
-        {
-            lock.unlock();
-        }
+        return new Task();
     }
-    public void unregister(PropertySetter observer, String property)
+
+    private class Task extends AbstractTask
     {
-        lock.lock();
-        try
-        {
-            Iterator<Entry<Long,Task>> it = taskMap.entrySet().iterator();
-            while (it.hasNext())
-            {
-                Entry<Long, Task> e = it.next();
-                Task task = e.getValue();
-                if (task.remove(observer, property))
-                {
-                    if (task.isEmpty())
-                    {
-                        task.cancel();
-                        it.remove();
-                    }
-                    break;
-                }
-            }
-            if (taskMap.isEmpty())
-            {
-                timer.cancel();
-                timer = null;
-            }
-        }
-        finally
-        {
-            lock.unlock();
-        }
-    }
-    private class Task extends TimerTask
-    {
-        private final MapList<String,PropertySetter> mapList = new HashMapList<>();
-        
-        private void add(PropertySetter observer, String property)
-        {
-            mapList.add(property, observer);
-        }
-        private boolean remove(PropertySetter observer, String property)
-        {
-            return mapList.removeItem(property, observer);
-        }
-        private boolean isEmpty()
-        {
-            return mapList.isEmpty();
-        }
         @Override
         public void run()
         {

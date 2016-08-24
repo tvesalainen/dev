@@ -17,11 +17,14 @@
 package org.vesalainen.dev;
 
 import java.util.function.DoubleSupplier;
+import org.vesalainen.math.Unit;
+import static org.vesalainen.math.UnitType.Ampere;
 
 /**
  *
  * @author tkv
  */
+@Unit(Ampere)
 public interface CurrentSource extends DoubleSupplier
 {
 }
