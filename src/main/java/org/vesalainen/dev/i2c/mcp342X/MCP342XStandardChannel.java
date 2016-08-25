@@ -18,8 +18,6 @@ package org.vesalainen.dev.i2c.mcp342X;
 
 import org.vesalainen.dev.VoltageSource;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
 

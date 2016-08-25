@@ -16,23 +16,28 @@
  */
 package org.vesalainen.dev.i2c.adcpi;
 
-import org.vesalainen.dev.VoltageSource;
+import org.junit.Test;
+import static org.junit.Assert.*;
+import org.vesalainen.dev.FixedVoltage;
 
 /**
  *
  * @author tkv
  */
-public class VoltageDividerChannel extends LineCorrectedChannel
+public class LineCorrectedChannelTest
 {
-    /**
-     * Creates a VoltageDividerChannel
-     * @param channel
-     * @param r1 Resistor in ohms to measured voltage
-     * @param r2 Resistor in ohms to ground
-     */
-    public VoltageDividerChannel(VoltageSource channel, double r1, double r2)
+
+    private static final double Epsilon = 1e-10;
+    
+    public LineCorrectedChannelTest()
     {
-        super(channel, (r1+r2)/r2);
     }
 
+    @Test
+    public void test1()
+    {
+        LineCorrectedChannel lcc = new LineCorrectedChannel(new FixedVoltage(2.872), 2.872, 13.61);
+        assertEquals(13.61, lcc.getAsDouble(), Epsilon);
+    }
+    
 }

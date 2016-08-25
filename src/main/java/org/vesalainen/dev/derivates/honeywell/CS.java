@@ -72,5 +72,11 @@ public class CS implements CurrentSource
     {
         this.sign = negative ? -1.0 : 1.0;
     }
+
+    @Override
+    public String toString()
+    {
+        return "CS{" + "maxAmps=" + maxAmps + ", turns=" + turns + ", measured=" + measured + ", reference=" + reference + ", sign=" + sign + '}';
+    }
     
 }

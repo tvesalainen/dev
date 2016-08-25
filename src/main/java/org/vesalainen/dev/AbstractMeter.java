@@ -32,12 +32,13 @@ import static org.vesalainen.loader.LibraryLoader.OS.Linux;
 import org.vesalainen.math.UnitType;
 import org.vesalainen.util.HashMapList;
 import org.vesalainen.util.MapList;
+import org.vesalainen.util.logging.JavaLogging;
 
 /**
  *
  * @author tkv
  */
-public abstract class AbstractMeter
+public abstract class AbstractMeter extends JavaLogging
 {
     
     protected Timer timer;
@@ -46,16 +47,19 @@ public abstract class AbstractMeter
 
     public AbstractMeter()
     {
+        super(AbstractMeter.class);
     }
 
     public static AbstractMeter getInstance(File devConfigFile) throws IOException
     {
         if (LibraryLoader.getOS() == Linux)
         {
+            JavaLogging.getLogger(AbstractMeter.class).config("meter from %s", devConfigFile);
             return new DevMeter(devConfigFile);
         }
         else
         {
+            JavaLogging.getLogger(AbstractMeter.class).config("meter as simulator");
             return new MeterSimulator();
         }
     }
@@ -67,6 +71,7 @@ public abstract class AbstractMeter
 
     public void register(PropertySetter observer, String property, long period, TimeUnit unit)
     {
+        fine("register(%s %d %s", property, period, unit);
         lock.lock();
         try
         {
@@ -90,6 +95,7 @@ public abstract class AbstractMeter
 
     public void unregister(PropertySetter observer, String property)
     {
+        fine("unregister(%s", property);
         lock.lock();
         try
         {

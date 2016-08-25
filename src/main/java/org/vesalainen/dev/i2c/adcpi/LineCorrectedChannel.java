@@ -16,7 +16,6 @@
  */
 package org.vesalainen.dev.i2c.adcpi;
 
-import java.io.IOException;
 import org.vesalainen.dev.VoltageSource;
 import org.vesalainen.math.AbstractLine;
 import org.vesalainen.math.Line;

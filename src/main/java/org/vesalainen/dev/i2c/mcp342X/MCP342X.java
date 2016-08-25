@@ -21,12 +21,13 @@ import java.io.IOException;
 import java.util.concurrent.locks.ReentrantLock;
 import org.vesalainen.dev.i2c.I2CSMBus;
 import org.vesalainen.dev.i2c.I2CSlave;
+import org.vesalainen.util.logging.JavaLogging;
 
 /**
  *
  * @author tkv
  */
-public class MCP342X
+public class MCP342X extends JavaLogging
 {
 
     public enum SampleRate {SPS240, SPS60, SPS15, SPS3_75};
@@ -58,11 +59,13 @@ public class MCP342X
     }
     MCP342X()
     {
+        super(MCP342X.class);
         this.channelCount = 4;
     }
 
     public MCP342X(int channelCount, I2CSMBus bus, short slaveAddress) throws IOException
     {
+        super(MCP342X.class);
         checkSlaveAddress(slaveAddress);
         this.channelCount = channelCount;
         this.bus = bus;
@@ -101,6 +104,7 @@ public class MCP342X
     public double measure(int channel, Resolution resolution, Gain gain) throws IOException
     {
         double rm = rawMeasure(channel, resolution, gain)/PGA[get2Bit(0)];
+        finest("measure(%d, %s, %s) = %f", channel, resolution, gain, rm);
         return rm;
     }
     double rawMeasure(int channel, Resolution resolution, Gain gain) throws IOException

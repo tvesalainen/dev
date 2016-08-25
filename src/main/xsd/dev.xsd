@@ -51,6 +51,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     <xsd:attribute name="channel" type="adcPiV2Channel" use="required"/>
                     <xsd:attribute name="name" type="xsd:string" use="required"/>
                     <xsd:attribute name="resistor" type="resistorType" default="0"/>
+                    <xsd:attribute name="points" type="pointsType"/>
                     <xsd:attribute name="resolution" type="mcp342xResolution"/>
                     <xsd:attribute name="gain" type="mcp342xGain"/>
                 </xsd:complexType>
@@ -67,6 +68,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <xsd:attribute name="turns" type="xsd:unsignedInt" default="1"/>
         <xsd:attribute name="negative" type="xsd:boolean" default="false"/>
     </xsd:complexType>
+    <xsd:simpleType name="pointsType">
+        <xsd:list itemType="xsd:double"/>
+    </xsd:simpleType>
     <xsd:simpleType name="resistorType">
         <xsd:restriction base="xsd:double">
             <xsd:minInclusive value="0"/>

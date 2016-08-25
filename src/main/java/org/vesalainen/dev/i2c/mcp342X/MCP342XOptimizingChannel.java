@@ -20,6 +20,7 @@ import java.io.IOException;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
 import static org.vesalainen.dev.i2c.mcp342X.MCP342X.Vref;
+import org.vesalainen.util.logging.JavaLogging;
 
 /**
  *
@@ -28,10 +29,12 @@ import static org.vesalainen.dev.i2c.mcp342X.MCP342X.Vref;
 public class MCP342XOptimizingChannel extends MCP342XStandardChannel
 {
     public static final double Limit = Vref/3.0;
+    private JavaLogging log;
 
     MCP342XOptimizingChannel(MCP342X mcp342x, int channel)
     {
         super(mcp342x, channel, Resolution.Bits18, Gain.X1);
+        log = new JavaLogging(MCP342XOptimizingChannel.class);
     }
 
     /**
@@ -45,6 +48,7 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
         try
         {
             double voltage = mcp342x.rawMeasure(channel, resolution, gain);
+            log.finer("rawMeasure(%d, %s, %s) = %f", channel, resolution, gain, voltage);
             if (Double.isInfinite(voltage))
             {
                 if (decGain())
@@ -63,7 +67,9 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
                     return getAsDouble();
                 }
             }
-            return voltage/mcp342x.getPGA();
+            double mea = voltage/mcp342x.getPGA();
+            log.finer("measured %f with %f", mea, mcp342x.getPGA());
+            return mea;
         }
         catch (IOException ex)
         {
@@ -80,7 +86,7 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
         else
         {
             gain = Gain.values()[gain.ordinal()+1];
-            System.err.println("gain -> "+gain);
+            log.finest("gain -> %s", gain);
             return true;
         }
     }
@@ -93,7 +99,7 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
         else
         {
             gain = Gain.values()[gain.ordinal()-1];
-            System.err.println("gain -> "+gain);
+            log.finest("gain -> %s", gain);
             return true;
         }
     }

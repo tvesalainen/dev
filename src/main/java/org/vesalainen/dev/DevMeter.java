@@ -88,6 +88,7 @@ public class DevMeter extends AbstractMeter
             throw new IllegalArgumentException(name+" not found");
         }
         Unit unit = supplier.getClass().getAnnotation(Unit.class);
+        finest("%s has unit %s", supplier, unit);
         if (unit != null)
         {
             return unit.value();
@@ -134,16 +135,41 @@ public class DevMeter extends AbstractMeter
     {
         int channelNumber = channel.getChannel()-1; // ADCPiV2 pins are numbered 1 - 8
         String name = channel.getName();
+        double[] points = null;
+        List<Double> pointList = channel.getPoints();
+        if (pointList != null && !pointList.isEmpty())
+        {
+            points = new double[pointList.size()];
+            for (int ii=0;ii<points.length;ii++)
+            {
+                points[ii] = pointList.get(ii);
+            }
+        }
         double resistor = channel.getResistor();
         Mcp342XGain gain = channel.getGain();
         Mcp342XResolution resolution = channel.getResolution();
+        config("channel(%s, %d, %f, %s, %s)", name, channelNumber, resistor, gain, resolution);
         if (gain == null || resolution == null)
         {
-            map.put(name, adcPiV2.getOptimizingVoltageDividerChannel(channelNumber, resistor));
+            if (points == null)
+            {
+                map.put(name, adcPiV2.getOptimizingVoltageDividerChannel(channelNumber, resistor));
+            }
+            else
+            {
+                map.put(name, adcPiV2.getOptimizingLineCorrectedChannel(channelNumber, points));
+            }
         }
         else
         {
-            map.put(name, adcPiV2.getVoltageDividerChannel(channelNumber, Resolution.valueOf(resolution.name()), Gain.valueOf(gain.name()), resistor));
+            if (points == null)
+            {
+                map.put(name, adcPiV2.getVoltageDividerChannel(channelNumber, Resolution.valueOf(resolution.name()), Gain.valueOf(gain.name()), resistor));
+            }
+            else
+            {
+                map.put(name, adcPiV2.getLineCorrectedChannel(channelNumber, Resolution.valueOf(resolution.name()), Gain.valueOf(gain.name()), points));
+            }
         }
     }
 
@@ -201,6 +227,7 @@ public class DevMeter extends AbstractMeter
         cs.setReference((VoltageSource) referenceVoltageSupplier);
         cs.setTurns(csType.getTurns());
         cs.setNegative(csType.isNegative());
+        config("add %s", cs);
         map.put(name, cs);
     }
 
@@ -224,7 +251,9 @@ public class DevMeter extends AbstractMeter
                     throw new IllegalArgumentException("no supplier for "+key);
                 }
                 double value = supplier.getAsDouble();
-                e.getValue().stream().forEach((PropertySetter ps)->ps.set(key, value));
+                List<PropertySetter> list = e.getValue();
+                finer("%s %f for %d", supplier, value, list.size());
+                list.stream().forEach((PropertySetter ps)->ps.set(key, value));
             }
         }
         

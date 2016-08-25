@@ -17,18 +17,20 @@
 package org.vesalainen.dev.i2c.adcpi;
 
 import java.io.IOException;
+import static java.util.logging.Level.*;
 import org.vesalainen.dev.i2c.I2CSMBus;
 import org.vesalainen.dev.i2c.mcp342X.MCP3424;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
 import org.vesalainen.dev.VoltageSource;
+import org.vesalainen.util.logging.JavaLogging;
 
 /**
  *
  * @author tkv
  */
-public class ADCPiV2 implements AutoCloseable
+public class ADCPiV2 extends JavaLogging implements AutoCloseable
 {
     private I2CSMBus smBus;
     private MCP3424 mcp1;
@@ -36,6 +38,7 @@ public class ADCPiV2 implements AutoCloseable
 
     public ADCPiV2(I2CSMBus smBus, MCP3424 mcp1, MCP3424 mcp2)
     {
+        super(ADCPiV2.class);
         this.smBus = smBus;
         this.mcp1 = mcp1;
         this.mcp2 = mcp2;
@@ -43,8 +46,19 @@ public class ADCPiV2 implements AutoCloseable
 
     public static ADCPiV2 open(int adapter, short slave1, short slave2) throws IOException
     {
+        JavaLogging logger = JavaLogging.getLogger(ADCPiV2.class);
+        logger.config("ADCPiV2 open(%d, 0x%x, 0x%x)", adapter,  slave1, slave2);
         I2CSMBus bus = I2CSMBus.open(adapter);
-        return new ADCPiV2(bus, new MCP3424(bus, slave1), new MCP3424(bus, slave2));
+        ADCPiV2 adc = new ADCPiV2(bus, new MCP3424(bus, slave1), new MCP3424(bus, slave2));
+        if (logger.isLoggable(CONFIG))
+        {
+            for (int ii=1;ii<=8;ii++)
+            {
+                VoltageSource oc = adc.getOptimizingChannel(ii);
+                logger.config("initial voltage on channel %d = %fV", ii, oc.getAsDouble());
+            }
+        }
+        return adc;
     }
     
     public VoltageSource getChannel(int channel, MCP342X.Resolution resolution, MCP342X.Gain gain)
