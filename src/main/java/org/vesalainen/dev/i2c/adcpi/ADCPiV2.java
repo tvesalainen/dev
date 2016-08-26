@@ -95,7 +95,7 @@ public class ADCPiV2 extends JavaLogging implements AutoCloseable
 
     public VoltageSource getOptimizingLineCorrectedChannel(int channel, double... points)
     {
-        return new LineCorrectedChannel(getOptChannel(channel), points);
+        return new LineCorrectedChannel(getOptimizingVoltageDividerChannel(channel, 0), points);
     }
     private VoltageSource getOptChannel(int channel)
     {
@@ -119,5 +119,11 @@ public class ADCPiV2 extends JavaLogging implements AutoCloseable
             mcp1 = null;
             mcp2 = null;
         }
+    }
+
+    @Override
+    public String toString()
+    {
+        return "ADCPiV2";
     }
 }

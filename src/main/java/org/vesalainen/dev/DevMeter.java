@@ -133,7 +133,7 @@ public class DevMeter extends AbstractMeter
     
     private void channel(ADCPiV2 adcPiV2, Channel channel)
     {
-        int channelNumber = channel.getChannel()-1; // ADCPiV2 pins are numbered 1 - 8
+        int channelNumber = channel.getChannel();
         String name = channel.getName();
         double[] points = null;
         List<Double> pointList = channel.getPoints();

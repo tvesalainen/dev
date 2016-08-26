@@ -19,6 +19,7 @@ package org.vesalainen.dev.i2c.adcpi;
 import org.vesalainen.dev.VoltageSource;
 import org.vesalainen.math.AbstractLine;
 import org.vesalainen.math.Line;
+import org.vesalainen.util.logging.JavaLogging;
 
 /**
  * LineCorrectedChannel scales measurements by using line. X-axis represents
@@ -26,13 +27,14 @@ import org.vesalainen.math.Line;
  * <p>Line is given by 1 or 2 points. 1 point version goes through (0, 0) 
  * @author tkv
  */
-public class LineCorrectedChannel implements VoltageSource
+public class LineCorrectedChannel extends JavaLogging implements VoltageSource
 {
-    protected final VoltageSource channel;
-    protected final Line line;
+    private final VoltageSource channel;
+    private final Line line;
 
     public LineCorrectedChannel(VoltageSource channel, double slope)
     {
+        super(LineCorrectedChannel.class);
         this.channel = channel;
         this.line = new AbstractLine(slope, 0, 0);
     }
@@ -44,6 +46,7 @@ public class LineCorrectedChannel implements VoltageSource
      */
     public LineCorrectedChannel(VoltageSource channel, double... points)
     {
+        super(LineCorrectedChannel.class);
         this.channel = channel;
         switch (points.length)
         {
@@ -62,7 +65,15 @@ public class LineCorrectedChannel implements VoltageSource
     public double getAsDouble()
     {
         double measure = channel.getAsDouble();
-        return line.getY(measure);
+        double corrected = line.getY(measure);
+        finer("corrected %f -> %f", measure, corrected);
+        return corrected;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "LineCorrectedChannel{" + "channel=" + channel + '}';
     }
     
 }

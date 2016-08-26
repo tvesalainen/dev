@@ -103,4 +103,10 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
             return true;
         }
     }
+
+    @Override
+    public String toString()
+    {
+        return "MCP342XOptimizingChannel{" + "mcp342x=" + mcp342x + ", channel=" + channel + ", resolution=" + resolution + ", gain=" + gain + '}';
+    }
 }

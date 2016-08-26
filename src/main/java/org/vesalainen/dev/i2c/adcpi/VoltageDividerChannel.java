@@ -24,6 +24,7 @@ import org.vesalainen.dev.VoltageSource;
  */
 public class VoltageDividerChannel extends LineCorrectedChannel
 {
+    private VoltageSource source;
     /**
      * Creates a VoltageDividerChannel
      * @param channel
@@ -33,6 +34,13 @@ public class VoltageDividerChannel extends LineCorrectedChannel
     public VoltageDividerChannel(VoltageSource channel, double r1, double r2)
     {
         super(channel, (r1+r2)/r2);
+        this.source = channel;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "VoltageDividerChannel{" + "source=" + source + '}';
     }
 
 }

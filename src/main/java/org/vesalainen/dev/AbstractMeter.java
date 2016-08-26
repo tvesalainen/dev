@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -71,19 +72,22 @@ public abstract class AbstractMeter extends JavaLogging
 
     public void register(PropertySetter observer, String property, long period, TimeUnit unit)
     {
-        fine("register(%s %d %s", property, period, unit);
+        fine("register(%s %d %s)", property, period, unit);
         lock.lock();
         try
         {
             if (timer == null)
             {
+                finer("started timer");
                 timer = new Timer(DevMeter.class.getSimpleName());
             }
             AbstractTask task = taskMap.get(period);
             if (task == null)
             {
+                finer("created task for %d %s", period, unit);
                 task = createTask();
                 timer.scheduleAtFixedRate(task, 100, unit.toMillis(period));
+                taskMap.put(period, task);
             }
             task.add(observer, property);
         }
@@ -95,19 +99,21 @@ public abstract class AbstractMeter extends JavaLogging
 
     public void unregister(PropertySetter observer, String property)
     {
-        fine("unregister(%s", property);
+        fine("unregister(%s)", property);
         lock.lock();
         try
         {
             Iterator<Map.Entry<Long, AbstractTask>> it = taskMap.entrySet().iterator();
             while (it.hasNext())
             {
-                Map.Entry<Long, AbstractTask> e = it.next();
+                Entry<Long, AbstractTask> e = it.next();
                 AbstractTask task = e.getValue();
                 if (task.remove(observer, property))
                 {
+                    finer("removed %s from task %d", property, e.getKey());
                     if (task.isEmpty())
                     {
+                        finer("removed task %d", e.getKey());
                         task.cancel();
                         it.remove();
                     }
@@ -116,6 +122,7 @@ public abstract class AbstractMeter extends JavaLogging
             }
             if (taskMap.isEmpty())
             {
+                finer("cancel timer");
                 timer.cancel();
                 timer = null;
             }

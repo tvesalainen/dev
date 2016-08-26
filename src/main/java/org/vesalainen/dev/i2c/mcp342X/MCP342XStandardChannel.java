@@ -56,4 +56,11 @@ public class MCP342XStandardChannel implements VoltageSource
             throw new RuntimeException(ex);
         }
     }
+
+    @Override
+    public String toString()
+    {
+        return "MCP342XStandardChannel{" + "mcp342x=" + mcp342x + ", channel=" + channel + ", resolution=" + resolution + ", gain=" + gain + '}';
+    }
+    
 }

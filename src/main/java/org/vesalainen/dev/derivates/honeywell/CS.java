@@ -18,12 +18,13 @@ package org.vesalainen.dev.derivates.honeywell;
 
 import org.vesalainen.dev.CurrentSource;
 import org.vesalainen.dev.VoltageSource;
+import org.vesalainen.util.logging.JavaLogging;
 
 /**
  *
  * @author tkv
  */
-public class CS implements CurrentSource
+public class CS extends JavaLogging implements CurrentSource
 {
     protected double maxAmps;
     protected double turns;
@@ -33,11 +34,13 @@ public class CS implements CurrentSource
 
     public CS(double maxAmps)
     {
+        super(CS.class);
         this.maxAmps = maxAmps;
     }
 
     public CS(double maxAmps, double turns, VoltageSource measured, VoltageSource reference, boolean negative)
     {
+        super(CS.class);
         this.maxAmps = maxAmps;
         this.turns = turns;
         this.measured = measured;
@@ -50,6 +53,7 @@ public class CS implements CurrentSource
     {
         double ref = reference.getAsDouble();
         double mea = measured.getAsDouble();
+        fine("%s: ref %f mea %f", this.getClass().getSimpleName(), ref, mea);
         return sign*turns*(mea - ref/2.0)*(maxAmps/(ref/4.0));
     }
 
