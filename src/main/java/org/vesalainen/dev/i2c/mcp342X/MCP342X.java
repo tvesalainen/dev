@@ -88,10 +88,10 @@ public class MCP342X extends JavaLogging
      * @param channel
      * @return 
      */
-    public VoltageSource getOptimizingChannel(int channel)
+    public VoltageSource getOptimizingChannel(int channel, Resolution resolution)
     {
         checkChannel(channel);
-        return new MCP342XOptimizingChannel(this, channel);
+        return new MCP342XOptimizingChannel(this, channel, resolution);
     }
     /**
      * Returns -2.048 - 2.048 or positive/negative infinity

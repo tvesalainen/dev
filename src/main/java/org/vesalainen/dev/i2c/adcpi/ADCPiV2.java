@@ -54,7 +54,7 @@ public class ADCPiV2 extends JavaLogging implements AutoCloseable
         {
             for (int ii=1;ii<=8;ii++)
             {
-                VoltageSource oc = adc.getOptimizingChannel(ii);
+                VoltageSource oc = adc.getOptimizingChannel(ii, Resolution.Bits12);
                 logger.config("initial voltage on channel %d = %fV", ii, oc.getAsDouble());
             }
         }
@@ -63,7 +63,7 @@ public class ADCPiV2 extends JavaLogging implements AutoCloseable
     
     public VoltageSource getChannel(int channel, MCP342X.Resolution resolution, MCP342X.Gain gain)
     {
-        return getVoltageDividerChannel(channel, resolution, gain, 0);
+        return getStdChannel(channel, resolution, gain);
     }
     public VoltageSource getVoltageDividerChannel(int channel, Resolution resolution, Gain gain, double resistor)
     {
@@ -84,29 +84,28 @@ public class ADCPiV2 extends JavaLogging implements AutoCloseable
             return mcp2.getChannel(channel-4, resolution, gain);
         }
     }
-    public VoltageSource getOptimizingChannel(int channel)
+    public VoltageSource getOptimizingChannel(int channel, Resolution resolution)
     {
-        return getOptimizingVoltageDividerChannel(channel, 0);
+        return getOptChannel(channel, resolution);
     }
-    public VoltageSource getOptimizingVoltageDividerChannel(int channel, double resistor)
+    public VoltageSource getOptimizingVoltageDividerChannel(int channel, Resolution resolution, double resistor)
     {
-        return new VoltageDividerChannel(getOptChannel(channel), 10000.0+resistor, 6800.0);
+        return new VoltageDividerChannel(getOptChannel(channel, resolution), 10000.0+resistor, 6800.0);
     }
 
-    public VoltageSource getOptimizingLineCorrectedChannel(int channel, double... points)
+    public VoltageSource getOptimizingLineCorrectedChannel(int channel, Resolution resolution, double... points)
     {
-        return new LineCorrectedChannel(getOptimizingVoltageDividerChannel(channel, 0), points);
+        return new LineCorrectedChannel(getOptChannel(channel, resolution), points);
     }
-    private VoltageSource getOptChannel(int channel)
+    private VoltageSource getOptChannel(int channel, Resolution resolution)
     {
-        VoltageSource ch;
         if (channel <= 4)
         {
-            return mcp1.getOptimizingChannel(channel);
+            return mcp1.getOptimizingChannel(channel, resolution);
         }
         else
         {
-            return mcp2.getOptimizingChannel(channel-4);
+            return mcp2.getOptimizingChannel(channel-4, resolution);
         }
     }
     @Override

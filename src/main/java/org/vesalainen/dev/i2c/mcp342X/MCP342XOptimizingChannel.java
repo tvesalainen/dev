@@ -31,9 +31,9 @@ public class MCP342XOptimizingChannel extends MCP342XStandardChannel
     public static final double Limit = Vref/3.0;
     private JavaLogging log;
 
-    MCP342XOptimizingChannel(MCP342X mcp342x, int channel)
+    MCP342XOptimizingChannel(MCP342X mcp342x, int channel, Resolution resolution)
     {
-        super(mcp342x, channel, Resolution.Bits18, Gain.X1);
+        super(mcp342x, channel, resolution, Gain.X1);
         log = new JavaLogging(MCP342XOptimizingChannel.class);
     }
 

@@ -42,7 +42,7 @@ public class LineCorrectedChannel extends JavaLogging implements VoltageSource
     /**
      * Creates a LineCorrectedChannel
      * @param channel
-     * @param points x, y or x1, y1, x2, y2
+     * @param points slope or x, y or x1, y1, x2, y2
      */
     public LineCorrectedChannel(VoltageSource channel, double... points)
     {
@@ -50,6 +50,9 @@ public class LineCorrectedChannel extends JavaLogging implements VoltageSource
         this.channel = channel;
         switch (points.length)
         {
+            case 1:
+                this.line = new AbstractLine(points[0], 0, 0);
+                break;
             case 2:
                 this.line = new AbstractLine(0, 0, points[0], points[1]);
                 break;
@@ -57,7 +60,7 @@ public class LineCorrectedChannel extends JavaLogging implements VoltageSource
                 this.line = new AbstractLine(points[0], points[1], points[2], points[3]);
                 break;
             default:
-                throw new IllegalArgumentException("number of points must be 2/4");
+                throw new IllegalArgumentException("number of points must be 1/2/4");
         }
     }
 
@@ -70,6 +73,11 @@ public class LineCorrectedChannel extends JavaLogging implements VoltageSource
         return corrected;
     }
 
+    public double getSlope()
+    {
+        return line.getSlope();
+    }
+    
     @Override
     public String toString()
     {

@@ -52,7 +52,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
                     <xsd:attribute name="name" type="xsd:string" use="required"/>
                     <xsd:attribute name="resistor" type="resistorType" default="0"/>
                     <xsd:attribute name="points" type="pointsType"/>
-                    <xsd:attribute name="resolution" type="mcp342xResolution"/>
+                    <xsd:attribute name="slope" type="xsd:double"/>
+                    <xsd:attribute name="resolution" type="mcp342xResolution" default="Bits12"/>
                     <xsd:attribute name="gain" type="mcp342xGain"/>
                 </xsd:complexType>
             </xsd:element>

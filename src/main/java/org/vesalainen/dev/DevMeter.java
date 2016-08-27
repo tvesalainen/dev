@@ -147,17 +147,17 @@ public class DevMeter extends AbstractMeter
         }
         double resistor = channel.getResistor();
         Mcp342XGain gain = channel.getGain();
-        Mcp342XResolution resolution = channel.getResolution();
+        Resolution resolution = Resolution.values()[channel.getResolution().ordinal()];
         config("channel(%s, %d, %f, %s, %s)", name, channelNumber, resistor, gain, resolution);
-        if (gain == null || resolution == null)
+        if (gain == null)
         {
             if (points == null)
             {
-                map.put(name, adcPiV2.getOptimizingVoltageDividerChannel(channelNumber, resistor));
+                map.put(name, adcPiV2.getOptimizingVoltageDividerChannel(channelNumber, resolution, resistor));
             }
             else
             {
-                map.put(name, adcPiV2.getOptimizingLineCorrectedChannel(channelNumber, points));
+                map.put(name, adcPiV2.getOptimizingLineCorrectedChannel(channelNumber, resolution, points));
             }
         }
         else

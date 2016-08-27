@@ -36,7 +36,15 @@ public class MCP342XStandardChannel implements VoltageSource
     {
         this.mcp342x = mcp342x;
         this.channel = channel;
+        if (resolution == null)
+        {
+            throw new NullPointerException("resolution");
+        }
         this.resolution = resolution;
+        if (gain == null)
+        {
+            throw new NullPointerException("gain");
+        }
         this.gain = gain;
     }
 
