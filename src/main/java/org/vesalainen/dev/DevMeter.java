@@ -41,7 +41,6 @@ import org.vesalainen.dev.jaxb.Dev.Derivates;
 import org.vesalainen.dev.jaxb.HoneywellCS;
 import org.vesalainen.dev.jaxb.I2CType;
 import org.vesalainen.dev.jaxb.Mcp342XGain;
-import org.vesalainen.dev.jaxb.Mcp342XResolution;
 import org.vesalainen.lang.Primitives;
 import org.vesalainen.math.Unit;
 import org.vesalainen.math.UnitType;
@@ -52,7 +51,7 @@ import org.vesalainen.math.UnitType;
  */
 public class DevMeter extends AbstractMeter
 {
-    private Map<String,DoubleSupplier> map = new HashMap<>();
+    private Map<String,Source> map = new HashMap<>();
 
     protected DevMeter(File devConfig) throws IOException
     {
@@ -82,21 +81,12 @@ public class DevMeter extends AbstractMeter
     @Override
     public UnitType getUnit(String name)
     {
-        DoubleSupplier supplier = map.get(name);
+        Source supplier = map.get(name);
         if (supplier == null)
         {
             throw new IllegalArgumentException(name+" not found");
         }
-        Unit unit = supplier.getClass().getAnnotation(Unit.class);
-        finest("%s has unit %s", supplier, unit);
-        if (unit != null)
-        {
-            return unit.value();
-        }
-        else
-        {
-            return UnitType.Unitless;
-        }
+        return supplier.type();
     }
 
     @Override

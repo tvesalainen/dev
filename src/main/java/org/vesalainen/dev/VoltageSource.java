@@ -18,6 +18,7 @@ package org.vesalainen.dev;
 
 import java.util.function.DoubleSupplier;
 import org.vesalainen.math.Unit;
+import org.vesalainen.math.UnitType;
 import static org.vesalainen.math.UnitType.Volt;
 
 /**
@@ -25,6 +26,13 @@ import static org.vesalainen.math.UnitType.Volt;
  * @author tkv
  */
 @Unit(Volt)
-public interface VoltageSource extends DoubleSupplier
+public interface VoltageSource extends Source
 {
+
+    @Override
+    public default UnitType type()
+    {
+        return UnitType.Volt;
+    }
+    
 }

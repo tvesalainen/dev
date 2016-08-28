@@ -16,21 +16,14 @@
  */
 package org.vesalainen.dev;
 
-import org.vesalainen.math.Unit;
+import java.util.function.DoubleSupplier;
 import org.vesalainen.math.UnitType;
-import static org.vesalainen.math.UnitType.Ampere;
 
 /**
  *
  * @author tkv
  */
-@Unit(Ampere)
-public interface CurrentSource extends Source
+public interface Source extends DoubleSupplier
 {
-    @Override
-    public default UnitType type()
-    {
-        return UnitType.Ampere;
-    }
-    
+    UnitType type();
 }
