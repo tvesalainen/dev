@@ -20,6 +20,7 @@ import org.vesalainen.dev.VoltageSource;
 import java.io.IOException;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Gain;
 import org.vesalainen.dev.i2c.mcp342X.MCP342X.Resolution;
+import static org.vesalainen.dev.i2c.mcp342X.MCP342X.Vref;
 
 /**
  *
@@ -63,6 +64,18 @@ public class MCP342XStandardChannel implements VoltageSource
         {
             throw new RuntimeException(ex);
         }
+    }
+
+    @Override
+    public double min()
+    {
+        return 0;
+    }
+
+    @Override
+    public double max()
+    {
+        return Vref;
     }
 
     @Override

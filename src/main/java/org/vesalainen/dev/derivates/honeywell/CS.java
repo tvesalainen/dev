@@ -78,6 +78,18 @@ public class CS extends JavaLogging implements CurrentSource
     }
 
     @Override
+    public double min()
+    {
+        return -maxAmps/turns;
+    }
+
+    @Override
+    public double max()
+    {
+        return maxAmps/turns;
+    }
+
+    @Override
     public String toString()
     {
         return "CS{" + "maxAmps=" + maxAmps + ", turns=" + turns + ", measured=" + measured + ", reference=" + reference + ", sign=" + sign + '}';

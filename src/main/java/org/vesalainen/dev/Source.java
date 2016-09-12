@@ -26,4 +26,6 @@ import org.vesalainen.math.UnitType;
 public interface Source extends DoubleSupplier
 {
     UnitType type();
+    double min();
+    double max();
 }

@@ -17,6 +17,7 @@
 package org.vesalainen.dev.i2c.adcpi;
 
 import org.vesalainen.dev.VoltageSource;
+import static org.vesalainen.dev.i2c.mcp342X.MCP342X.Vref;
 import org.vesalainen.math.AbstractLine;
 import org.vesalainen.math.Line;
 import org.vesalainen.util.logging.JavaLogging;
@@ -76,6 +77,18 @@ public class LineCorrectedChannel extends JavaLogging implements VoltageSource
     public double getSlope()
     {
         return line.getSlope();
+    }
+
+    @Override
+    public double min()
+    {
+        return 0;
+    }
+
+    @Override
+    public double max()
+    {
+        return line.getY(Vref);
     }
     
     @Override

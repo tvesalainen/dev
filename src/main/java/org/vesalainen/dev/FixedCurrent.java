@@ -34,5 +34,17 @@ public class FixedCurrent implements CurrentSource
     {
         return current;
     }
+
+    @Override
+    public double min()
+    {
+        return 0;
+    }
+
+    @Override
+    public double max()
+    {
+        return current;
+    }
     
 }

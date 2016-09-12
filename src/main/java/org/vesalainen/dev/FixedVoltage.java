@@ -35,4 +35,16 @@ public class FixedVoltage implements VoltageSource
         return voltage;
     }
     
+    @Override
+    public double min()
+    {
+        return 0;
+    }
+
+    @Override
+    public double max()
+    {
+        return voltage;
+    }
+    
 }
