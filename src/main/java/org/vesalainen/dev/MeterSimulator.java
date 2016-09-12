@@ -51,6 +51,18 @@ public class MeterSimulator extends AbstractMeter
     }
 
     @Override
+    public double getMin(String name)
+    {
+        return 0;
+    }
+
+    @Override
+    public double getMax(String name)
+    {
+        return 20;
+    }
+
+    @Override
     public double meter(String name)
     {
         return 12.345;
