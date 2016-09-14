@@ -66,6 +66,10 @@ public abstract class AbstractMeter extends JavaLogging
     }
     public abstract UnitType getUnit(String name);
     
+    public abstract double getMin(String name);
+    
+    public abstract double getMax(String name);
+    
     public abstract Set<String> getNames();
 
     public abstract double meter(String name);

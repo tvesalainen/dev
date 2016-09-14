@@ -24,14 +24,22 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
     <xsd:element name="dev">
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element name="i2c" type="i2cType" maxOccurs="unbounded">
-                </xsd:element>
+                <xsd:element name="i2c" type="i2cType" maxOccurs="unbounded"/>
                 <xsd:element name="derivates">
                     <xsd:complexType>
                         <xsd:sequence>
                             <xsd:element name="CSLA1GD" type="honeywellCS" maxOccurs="unbounded"/>
                             <xsd:element name="CSLH3A9" type="honeywellCS" maxOccurs="unbounded"/>
                         </xsd:sequence>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="log" maxOccurs="unbounded">
+                    <xsd:complexType>
+                        <xsd:attribute name="logger" type="xsd:string" use="required"/>
+                        <xsd:attribute name="meters" type="metersType" use="required"/>
+                        <xsd:attribute name="format" type="xsd:string" use="required"/>
+                        <xsd:attribute name="period" type="xsd:unsignedLong" default="1000"/>
+                        <xsd:attribute name="level" type="xsd:string" default="info"/>
                     </xsd:complexType>
                 </xsd:element>
             </xsd:sequence>
@@ -116,5 +124,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
             <xsd:enumeration value="X4"/>
             <xsd:enumeration value="X8"/>
         </xsd:restriction>
+    </xsd:simpleType>
+    <xsd:simpleType name="metersType">
+        <xsd:list itemType="xsd:string"/>
     </xsd:simpleType>
 </xsd:schema>

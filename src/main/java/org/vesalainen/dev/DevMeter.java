@@ -23,10 +23,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleSupplier;
+import java.util.logging.Level;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
+import org.vesalainen.code.DoubleFire;
 import org.vesalainen.code.PropertySetter;
 import org.vesalainen.dev.derivates.honeywell.CS;
 import org.vesalainen.dev.derivates.honeywell.CSLA1GD;
@@ -38,12 +41,16 @@ import org.vesalainen.dev.jaxb.ADCPiV2Type;
 import org.vesalainen.dev.jaxb.ADCPiV2Type.Channel;
 import org.vesalainen.dev.jaxb.Dev;
 import org.vesalainen.dev.jaxb.Dev.Derivates;
+import org.vesalainen.dev.jaxb.Dev.Log;
 import org.vesalainen.dev.jaxb.HoneywellCS;
 import org.vesalainen.dev.jaxb.I2CType;
 import org.vesalainen.dev.jaxb.Mcp342XGain;
 import org.vesalainen.lang.Primitives;
-import org.vesalainen.math.Unit;
 import org.vesalainen.math.UnitType;
+import org.vesalainen.util.DoubleMap;
+import org.vesalainen.util.DoubleReference;
+import org.vesalainen.util.logging.BaseLogging;
+import org.vesalainen.util.logging.JavaLogging;
 
 /**
  *
@@ -65,6 +72,10 @@ public class DevMeter extends AbstractMeter
                 i2c(i2cType);
             }
             derivates(dev.getDerivates());
+            for (Log log : dev.getLog())
+            {
+                log(log);
+            }
         }
         catch (JAXBException ex)
         {
@@ -81,12 +92,34 @@ public class DevMeter extends AbstractMeter
     @Override
     public UnitType getUnit(String name)
     {
-        Source supplier = map.get(name);
-        if (supplier == null)
+        Source source = map.get(name);
+        if (source == null)
         {
             throw new IllegalArgumentException(name+" not found");
         }
-        return supplier.type();
+        return source.type();
+    }
+
+    @Override
+    public double getMin(String name)
+    {
+        Source source = map.get(name);
+        if (source == null)
+        {
+            throw new IllegalArgumentException(name+" not found");
+        }
+        return source.min();
+    }
+
+    @Override
+    public double getMax(String name)
+    {
+        Source source = map.get(name);
+        if (source == null)
+        {
+            throw new IllegalArgumentException(name+" not found");
+        }
+        return source.max();
     }
 
     @Override
@@ -97,7 +130,9 @@ public class DevMeter extends AbstractMeter
         {
             throw new IllegalArgumentException(name + " not found");
         }
-        return supplier.getAsDouble();
+        double result = supplier.getAsDouble();
+        info("%s = %f", name, result);
+        return result;
     }
 
     
@@ -227,6 +262,57 @@ public class DevMeter extends AbstractMeter
         return new Task();
     }
 
+    private void log(Log log)
+    {
+        LogHandler logHandler = new LogHandler(log);
+        for (String meter : log.getMeters())
+        {
+            register(logHandler, meter, log.getPeriod().longValue(), TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private class LogHandler extends JavaLogging implements DoubleFire
+    {
+        private final String format;
+        private final Level level;
+        private final List<String> meters;
+        private final int size;
+        private final DoubleMap<String> map = new DoubleMap<>();
+        private final Object[] array;
+        private int count;
+
+        public LogHandler(Log log)
+        {
+            super(log.getLogger());
+            this.level = BaseLogging.parseLevel(log.getLevel());
+            this.format = log.getFormat();
+            this.meters = log.getMeters();
+            this.size = meters.size();
+            int ii=0;
+            for (String property : meters)
+            {
+                map.put(property, 0);
+            }
+            array = new Object[size];
+        }
+        
+        @Override
+        public void fire(String property, double value)
+        {
+            map.put(property, value);
+            count++;
+            if (count % size == 0)
+            {
+                int ii=0;
+                for (String meter : meters)
+                {
+                    array[ii++] = map.getDouble(meter);
+                }
+                log(level, format, array);
+            }
+        }
+        
+    }
     private class Task extends AbstractTask
     {
         @Override
