@@ -45,10 +45,10 @@ import org.vesalainen.dev.jaxb.Dev.Log;
 import org.vesalainen.dev.jaxb.HoneywellCS;
 import org.vesalainen.dev.jaxb.I2CType;
 import org.vesalainen.dev.jaxb.Mcp342XGain;
+import org.vesalainen.dev.jaxb.SourceType;
 import org.vesalainen.lang.Primitives;
 import org.vesalainen.math.UnitType;
 import org.vesalainen.util.DoubleMap;
-import org.vesalainen.util.DoubleReference;
 import org.vesalainen.util.logging.BaseLogging;
 import org.vesalainen.util.logging.JavaLogging;
 
@@ -58,7 +58,9 @@ import org.vesalainen.util.logging.JavaLogging;
  */
 public class DevMeter extends AbstractMeter
 {
-    private Map<String,Source> map = new HashMap<>();
+    private final Map<String,Source> map = new HashMap<>();
+    private final DoubleMap<String> minMap = new DoubleMap<>();
+    private final DoubleMap<String> maxMap = new DoubleMap<>();
 
     protected DevMeter(File devConfig) throws IOException
     {
@@ -103,6 +105,10 @@ public class DevMeter extends AbstractMeter
     @Override
     public double getMin(String name)
     {
+        if (minMap.containsKey(name))
+        {
+            return minMap.getDouble(name);
+        }
         Source source = map.get(name);
         if (source == null)
         {
@@ -114,6 +120,10 @@ public class DevMeter extends AbstractMeter
     @Override
     public double getMax(String name)
     {
+        if (maxMap.containsKey(name))
+        {
+            return maxMap.getDouble(name);
+        }
         Source source = map.get(name);
         if (source == null)
         {
@@ -160,6 +170,7 @@ public class DevMeter extends AbstractMeter
     {
         int channelNumber = channel.getChannel();
         String name = channel.getName();
+        handleLimits(channel);
         double[] points = null;
         List<Double> pointList = channel.getPoints();
         if (pointList != null && !pointList.isEmpty())
@@ -216,6 +227,7 @@ public class DevMeter extends AbstractMeter
     private void populate(CS cs, HoneywellCS csType)
     {
         String name = csType.getName();
+        handleLimits(csType);
         if (map.containsKey(name))
         {
             throw new IllegalArgumentException(name+" is already defined");
@@ -268,6 +280,20 @@ public class DevMeter extends AbstractMeter
         for (String meter : log.getMeters())
         {
             register(logHandler, meter, log.getPeriod().longValue(), TimeUnit.MILLISECONDS);
+        }
+    }
+
+    private void handleLimits(SourceType sourceType)
+    {
+        Double min = sourceType.getMin();
+        if (min != null)
+        {
+            minMap.put(sourceType.getName(), min);
+        }
+        Double max = sourceType.getMax();
+        if (max != null)
+        {
+            maxMap.put(sourceType.getName(), max);
         }
     }
 

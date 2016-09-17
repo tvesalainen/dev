@@ -56,13 +56,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <xsd:sequence>
             <xsd:element name="channel" maxOccurs="8">
                 <xsd:complexType>
-                    <xsd:attribute name="channel" type="adcPiV2Channel" use="required"/>
-                    <xsd:attribute name="name" type="xsd:string" use="required"/>
-                    <xsd:attribute name="resistor" type="resistorType" default="0"/>
-                    <xsd:attribute name="points" type="pointsType"/>
-                    <xsd:attribute name="slope" type="xsd:double"/>
-                    <xsd:attribute name="resolution" type="mcp342xResolution" default="Bits12"/>
-                    <xsd:attribute name="gain" type="mcp342xGain"/>
+                    <xsd:complexContent>
+                        <xsd:extension base="sourceType">
+                            <xsd:attribute name="channel" type="adcPiV2Channel" use="required"/>
+                            <xsd:attribute name="resistor" type="resistorType" default="0"/>
+                            <xsd:attribute name="points" type="pointsType"/>
+                            <xsd:attribute name="slope" type="xsd:double"/>
+                            <xsd:attribute name="resolution" type="mcp342xResolution" default="Bits12"/>
+                            <xsd:attribute name="gain" type="mcp342xGain"/>
+                        </xsd:extension>
+                    </xsd:complexContent>
                 </xsd:complexType>
             </xsd:element>
         </xsd:sequence>
@@ -70,12 +73,20 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
         <xsd:attribute name="slave2" type="mcp342xSlaveAddress" use="required"/>
     </xsd:complexType>
     <xsd:complexType name="honeywellCS">
+        <xsd:complexContent>
+            <xsd:extension base="sourceType">
+                <xsd:attribute name="measureReference" type="xsd:string" use="required"/>
+                <xsd:attribute name="referenceVoltageReference" type="xsd:string"/>
+                <xsd:attribute name="referenceVoltage" type="xsd:double"/>
+                <xsd:attribute name="turns" type="xsd:unsignedInt" default="1"/>
+                <xsd:attribute name="negative" type="xsd:boolean" default="false"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <xsd:complexType name="sourceType">
         <xsd:attribute name="name" type="xsd:string" use="required"/>
-        <xsd:attribute name="measureReference" type="xsd:string" use="required"/>
-        <xsd:attribute name="referenceVoltageReference" type="xsd:string"/>
-        <xsd:attribute name="referenceVoltage" type="xsd:double"/>
-        <xsd:attribute name="turns" type="xsd:unsignedInt" default="1"/>
-        <xsd:attribute name="negative" type="xsd:boolean" default="false"/>
+        <xsd:attribute name="min" type="xsd:double"/>
+        <xsd:attribute name="max" type="xsd:double"/>
     </xsd:complexType>
     <xsd:simpleType name="pointsType">
         <xsd:list itemType="xsd:double"/>
