@@ -35,7 +35,12 @@ public class LibraryLoader
     
     private static final Map<String,Path> map = new HashMap<>();
     private static OS os;
-    
+    /**
+     * Return current operating system
+     * @return
+     * @deprecated Use org.vesalainen.util.OperationSystem
+     * @see org.vesalainen.util.OperatingSystem#getOperationSystem
+     */
     public static OS getOS()
     {
         if (os == null)
