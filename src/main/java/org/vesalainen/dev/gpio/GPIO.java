@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 tkv
+ * Copyright (C) 2017 Timo Vesalainen <timo.vesalainen@iki.fi>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ import org.vesalainen.loader.LibraryLoader.OS;
 /**
  * GPIO class represent one General Purpose Input/Output pin. Each pin has number
  * and it is either input or output.
- * @author tkv
+ * @author Timo Vesalainen <timo.vesalainen@iki.fi>
  */
 public abstract class GPIO implements AutoCloseable
 {

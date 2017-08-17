@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 tkv
+ * Copyright (C) 2016 Timo Vesalainen <timo.vesalainen@iki.fi>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ import org.vesalainen.util.logging.JavaLogging;
  * LineCorrectedChannel scales measurements by using line. X-axis represents
  * raw measurements and Y-axis wanted output.
  * <p>Line is given by 1 or 2 points. 1 point version goes through (0, 0) 
- * @author tkv
+ * @author Timo Vesalainen <timo.vesalainen@iki.fi>
  */
 public class LineCorrectedChannel extends JavaLogging implements VoltageSource
 {
