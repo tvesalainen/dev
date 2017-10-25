@@ -67,70 +67,76 @@ public class LibraryLoader
 
     public static void loadLibrary(Class<?> clazz, String lib) throws IOException
     {
-        String osArch = System.getProperty("os.arch");
-        switch (getOS())
-        {
-            case Linux:
-                switch (osArch)
-                {
-                    case "amd64":
-                        lib = lib+"x86_64";
-                        break;
-                    case "x86":
-                        lib = lib+"i686";
-                        break;
-                    case "arm":
-                        lib = lib+"armv7l";
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(osArch+" not supported");
-                }
-                break;
-            case Windows:
-                switch (osArch)
-                {
-                    case "amd64":
-                        lib = lib+"64";
-                        break;
-                    case "x86":
-                        lib = lib+"32";
-                        break;
-                    default:
-                        throw new UnsupportedOperationException(osArch+" not supported");
-                }
-                break;
-        }
         try
         {
             System.loadLibrary(lib);
         }
         catch (UnsatisfiedLinkError ule)
         {
-            if (map.containsKey(lib))
+            String osArch = System.getProperty("os.arch");
+            switch (getOS())
             {
-                return; // lib is already loaded
+                case Linux:
+                    switch (osArch)
+                    {
+                        case "amd64":
+                            lib = lib+"x86_64";
+                            break;
+                        case "x86":
+                            lib = lib+"i686";
+                            break;
+                        case "arm":
+                            lib = lib+"armv7l";
+                            break;
+                        default:
+                            throw new UnsupportedOperationException(osArch+" not supported");
+                    }
+                    break;
+                case Windows:
+                    switch (osArch)
+                    {
+                        case "amd64":
+                            lib = lib+"64";
+                            break;
+                        case "x86":
+                            lib = lib+"32";
+                            break;
+                        default:
+                            throw new UnsupportedOperationException(osArch+" not supported");
+                    }
+                    break;
             }
-            ClassLoader classLoader = clazz.getClassLoader();
-            if (classLoader == null)
+            try
             {
-                classLoader = ClassLoader.getSystemClassLoader();
+                System.loadLibrary(lib);
             }
-            String libraryName = System.mapLibraryName(lib);
-            try (InputStream is = classLoader.getResourceAsStream(libraryName))
+            catch (UnsatisfiedLinkError ule2)
             {
-                if (is == null)
+                if (map.containsKey(lib))
                 {
-                    throw new UnsatisfiedLinkError(libraryName+" not found");
+                    return; // lib is already loaded
                 }
-                Path tempPath = Files.createTempFile(null, libraryName);
-                Files.copy(is, tempPath, REPLACE_EXISTING);
-                String path = tempPath.toString();
-                System.load(path);
-                System.err.println("Warning! Loading "+libraryName+" from "+path);
-                System.err.println("Copy "+path+" to java.library.path as "+libraryName);
-                map.put(lib, tempPath);
+                ClassLoader classLoader = clazz.getClassLoader();
+                if (classLoader == null)
+                {
+                    classLoader = ClassLoader.getSystemClassLoader();
+                }
+                String libraryName = System.mapLibraryName(lib);
+                try (InputStream is = classLoader.getResourceAsStream(libraryName))
+                {
+                    if (is == null)
+                    {
+                        throw new UnsatisfiedLinkError(libraryName+" not found");
+                    }
+                    Path tempPath = Files.createTempFile(null, libraryName);
+                    Files.copy(is, tempPath, REPLACE_EXISTING);
+                    String path = tempPath.toString();
+                    System.load(path);
+                    System.err.println("Warning! Loading "+libraryName+" from "+path);
+                    System.err.println("Copy "+path+" to java.library.path as "+libraryName);
+                    map.put(lib, tempPath);
+                }
             }
         }
     }
-
 }
